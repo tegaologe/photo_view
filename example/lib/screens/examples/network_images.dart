@@ -4,6 +4,8 @@ import 'package:photo_view_example/screens/common/common_example_wrapper.dart';
 import 'package:photo_view_example/screens/common/example_button.dart';
 
 class NetworkExamples extends StatelessWidget {
+  const NetworkExamples({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ExampleAppBarLayout(
@@ -49,7 +51,7 @@ class NetworkExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const NetworkImage(
+                    imageProvider: NetworkImage(
                       "https://pudim.com.br/sss.jpg",
                     ),
                     backgroundDecoration: BoxDecoration(
@@ -71,13 +73,11 @@ class NetworkExamples extends StatelessWidget {
                       "https://pudim.com.br/sss.jpg",
                     ),
                     errorBuilder: (_, __, ___) {
-                      return Container(
-                        child: Column(
-                          children: [
-                            Image.asset("assets/neat.gif"),
-                            const Text("well, that went badly"),
-                          ],
-                        ),
+                      return Column(
+                        children: [
+                          Image.asset("assets/neat.gif"),
+                          const Text("well, that went badly"),
+                        ],
                       );
                     },
                   ),

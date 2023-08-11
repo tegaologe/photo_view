@@ -1,7 +1,4 @@
-library photo_view;
-
 import 'package:flutter/material.dart';
-
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
@@ -234,8 +231,8 @@ class PhotoView extends StatefulWidget {
   /// image providers, ie: [AssetImage] or [NetworkImage]
   ///
   /// Internally, the image is rendered within an [Image] widget.
-  PhotoView({
-    Key? key,
+  const PhotoView({
+    super.key,
     required this.imageProvider,
     this.loadingBuilder,
     this.backgroundDecoration,
@@ -264,8 +261,7 @@ class PhotoView extends StatefulWidget {
     this.enablePanAlways,
     this.strictScale,
   })  : child = null,
-        childSize = null,
-        super(key: key);
+        childSize = null;
 
   /// Creates a widget that displays a zoomable child.
   ///
@@ -273,8 +269,8 @@ class PhotoView extends StatefulWidget {
   ///
   /// Instead of a [imageProvider], this constructor will receive a [child] and a [childSize].
   ///
-  PhotoView.customChild({
-    Key? key,
+  const PhotoView.customChild({
+    super.key,
     required this.child,
     this.childSize,
     this.backgroundDecoration,
@@ -303,8 +299,7 @@ class PhotoView extends StatefulWidget {
         imageProvider = null,
         semanticLabel = null,
         gaplessPlayback = false,
-        loadingBuilder = null,
-        super(key: key);
+        loadingBuilder = null;
 
   /// Given a [imageProvider] it resolves into an zoomable image widget using. It
   /// is required
@@ -494,9 +489,7 @@ class _PhotoViewState extends State<PhotoView>
   }
 
   void scaleStateListener(PhotoViewScaleState scaleState) {
-    if (widget.scaleStateChangedCallback != null) {
-      widget.scaleStateChangedCallback!(_scaleStateController.scaleState);
-    }
+    widget.scaleStateChangedCallback?.call(_scaleStateController.scaleState);
   }
 
   @override
@@ -513,7 +506,6 @@ class _PhotoViewState extends State<PhotoView>
 
         return widget._isCustomChild
             ? CustomChildWrapper(
-                child: widget.child,
                 childSize: widget.childSize,
                 backgroundDecoration: backgroundDecoration,
                 heroAttributes: widget.heroAttributes,
@@ -536,6 +528,7 @@ class _PhotoViewState extends State<PhotoView>
                 disableGestures: widget.disableGestures,
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
+                child: widget.child,
               )
             : ImageWrapper(
                 imageProvider: widget.imageProvider!,

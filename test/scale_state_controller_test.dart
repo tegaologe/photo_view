@@ -32,13 +32,15 @@ void main() {
   });
 
   test('controller stream mutation', () {
-    const PhotoViewScaleState value1 = PhotoViewScaleState.covering;
-    const PhotoViewScaleState value2 = PhotoViewScaleState.originalSize;
-    const PhotoViewScaleState value3 = PhotoViewScaleState.initial;
-    const PhotoViewScaleState value4 = PhotoViewScaleState.zoomedOut;
+    const value1 = PhotoViewScaleState.covering;
+    const value2 = PhotoViewScaleState.originalSize;
+    const value3 = PhotoViewScaleState.initial;
+    const value4 = PhotoViewScaleState.zoomedOut;
 
-    expect(controller.outputScaleStateStream,
-        emitsInOrder([value1, value2, value3, value4]));
+    expect(
+      controller.outputScaleStateStream,
+      emitsInOrder([value1, value2, value3, value4]),
+    );
     controller.scaleState = PhotoViewScaleState.covering;
     controller.scaleState = PhotoViewScaleState.originalSize;
     controller.reset();
@@ -47,10 +49,8 @@ void main() {
   });
 
   test('controller invisible update', () {
-    int count = 0;
-    final void Function() callback = () {
-      count++;
-    };
+    var count = 0;
+    void callback() => count++;
 
     controller.addIgnorableListener(callback);
 

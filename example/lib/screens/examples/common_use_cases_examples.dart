@@ -5,6 +5,8 @@ import 'package:photo_view_example/screens/common/common_example_wrapper.dart';
 import 'package:photo_view_example/screens/common/example_button.dart';
 
 class CommonUseCasesExamples extends StatelessWidget {
+  const CommonUseCasesExamples({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ExampleAppBarLayout(
@@ -19,7 +21,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    imageProvider: AssetImage("assets/large-image.jpg"),
                   ),
                 ),
               );
@@ -32,7 +34,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    imageProvider: AssetImage("assets/large-image.jpg"),
                     filterQuality: FilterQuality.medium,
                   ),
                 ),
@@ -46,7 +48,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/small-image.jpg"),
+                    imageProvider: AssetImage("assets/small-image.jpg"),
                     backgroundDecoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: <Color>[Colors.white, Colors.grey],
@@ -65,7 +67,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/small-image.jpg"),
+                    imageProvider: AssetImage("assets/small-image.jpg"),
                     backgroundDecoration: BoxDecoration(
                       color: Colors.white,
                     ),
@@ -82,7 +84,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/neat.gif"),
+                    imageProvider: AssetImage("assets/neat.gif"),
                   ),
                 ),
               );
@@ -125,7 +127,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const OneTapWrapper(
-                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    imageProvider: AssetImage("assets/large-image.jpg"),
                   ),
                 ),
               );
@@ -138,7 +140,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CommonExampleRouteWrapper(
-                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    imageProvider: AssetImage("assets/large-image.jpg"),
                     disableGestures: true,
                   ),
                 ),
@@ -153,6 +155,7 @@ class CommonUseCasesExamples extends StatelessWidget {
 
 class OneTapWrapper extends StatelessWidget {
   const OneTapWrapper({
+    super.key,
     required this.imageProvider,
   });
 

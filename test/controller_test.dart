@@ -10,14 +10,13 @@ void main() {
   });
 
   test('controller constructor', () {
-    const double initialRotation = 0.0;
-    const Offset initialPosition = Offset(40.0, 40.0);
+    const initialRotation = 0.0;
+    const initialPosition = Offset(40.0, 40.0);
     controller = PhotoViewController(
-      initialRotation: initialRotation,
       initialPosition: initialPosition,
     );
 
-    const PhotoViewControllerValue testValue = const PhotoViewControllerValue(
+    const testValue = PhotoViewControllerValue(
       position: initialPosition,
       scale: null,
       rotation: initialRotation,
@@ -55,29 +54,29 @@ void main() {
     expect(controller.rotation, 0.0);
   });
   test('controller stream mutation', () {
-    const PhotoViewControllerValue value1 = const PhotoViewControllerValue(
+    const value1 = PhotoViewControllerValue(
       position: Offset.zero,
       scale: null,
       rotation: 1.0,
       rotationFocusPoint: null,
     );
 
-    const PhotoViewControllerValue value2 = const PhotoViewControllerValue(
+    const value2 = PhotoViewControllerValue(
       position: Offset.zero,
       scale: 3.0,
       rotation: 1.0,
       rotationFocusPoint: null,
     );
 
-    const PhotoViewControllerValue value3 = const PhotoViewControllerValue(
-      position: const Offset(1, 1),
+    const value3 = PhotoViewControllerValue(
+      position: Offset(1, 1),
       scale: 3.0,
       rotation: 45.0,
       rotationFocusPoint: null,
     );
 
-    const PhotoViewControllerValue value4 = const PhotoViewControllerValue(
-      position: const Offset(1, 1),
+    const value4 = PhotoViewControllerValue(
+      position: Offset(1, 1),
       scale: 5.0,
       rotation: 45.0,
       rotationFocusPoint: null,

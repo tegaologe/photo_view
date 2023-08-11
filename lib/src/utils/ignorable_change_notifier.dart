@@ -29,12 +29,12 @@ class IgnorableChangeNotifier extends ChangeNotifier {
     return super.hasListeners || (_ignorableListeners?.isNotEmpty ?? false);
   }
 
-  void addIgnorableListener(listener) {
+  void addIgnorableListener(void Function() listener) {
     assert(_debugAssertNotDisposed());
     _ignorableListeners!.add(listener);
   }
 
-  void removeIgnorableListener(listener) {
+  void removeIgnorableListener(void Function() listener) {
     assert(_debugAssertNotDisposed());
     _ignorableListeners!.remove(listener);
   }
@@ -51,9 +51,8 @@ class IgnorableChangeNotifier extends ChangeNotifier {
   void notifyListeners() {
     super.notifyListeners();
     if (_ignorableListeners != null) {
-      final List<VoidCallback> localListeners =
-          List<VoidCallback>.from(_ignorableListeners!);
-      for (VoidCallback listener in localListeners) {
+      final localListeners = List<VoidCallback>.from(_ignorableListeners!);
+      for (final listener in localListeners) {
         try {
           if (_ignorableListeners!.contains(listener)) {
             listener();

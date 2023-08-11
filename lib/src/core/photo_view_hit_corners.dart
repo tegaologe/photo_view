@@ -5,8 +5,8 @@ import 'package:photo_view/src/controller/photo_view_controller_delegate.dart'
 
 mixin HitCornersDetector on PhotoViewControllerDelegate {
   HitCorners _hitCornersX() {
-    final double childWidth = scaleBoundaries.childSize.width * scale;
-    final double screenWidth = scaleBoundaries.outerSize.width;
+    final childWidth = scaleBoundaries.childSize.width * scale;
+    final screenWidth = scaleBoundaries.outerSize.width;
     if (screenWidth >= childWidth) {
       return const HitCorners(true, true);
     }
@@ -16,8 +16,8 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
   }
 
   HitCorners _hitCornersY() {
-    final double childHeight = scaleBoundaries.childSize.height * scale;
-    final double screenHeight = scaleBoundaries.outerSize.height;
+    final childHeight = scaleBoundaries.childSize.height * scale;
+    final screenHeight = scaleBoundaries.outerSize.height;
     if (screenHeight >= childHeight) {
       return const HitCorners(true, true);
     }
@@ -27,7 +27,10 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
   }
 
   bool _shouldMoveAxis(
-      HitCorners hitCorners, double mainAxisMove, double crossAxisMove) {
+    HitCorners hitCorners,
+    double mainAxisMove,
+    double crossAxisMove,
+  ) {
     if (mainAxisMove == 0) {
       return false;
     }

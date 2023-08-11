@@ -1,16 +1,13 @@
-library photo_view_gallery;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart'
     show
         LoadingBuilder,
         PhotoView,
+        PhotoViewImageScaleEndCallback,
         PhotoViewImageTapDownCallback,
         PhotoViewImageTapUpCallback,
-        PhotoViewImageScaleEndCallback,
         ScaleStateCycle;
-
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
@@ -22,7 +19,9 @@ typedef PhotoViewGalleryPageChangedCallback = void Function(int index);
 
 /// A type definition for a [Function] that defines a page in [PhotoViewGallery.build]
 typedef PhotoViewGalleryBuilder = PhotoViewGalleryPageOptions Function(
-    BuildContext context, int index);
+  BuildContext context,
+  int index,
+);
 
 /// A [StatefulWidget] that shows multiple [PhotoView] widgets in a [PageView]
 ///
@@ -102,7 +101,7 @@ typedef PhotoViewGalleryBuilder = PhotoViewGalleryPageOptions Function(
 class PhotoViewGallery extends StatefulWidget {
   /// Construct a gallery with static items through a list of [PhotoViewGalleryPageOptions].
   const PhotoViewGallery({
-    Key? key,
+    super.key,
     required this.pageOptions,
     this.loadingBuilder,
     this.backgroundDecoration,
@@ -118,16 +117,15 @@ class PhotoViewGallery extends StatefulWidget {
     this.customSize,
     this.allowImplicitScrolling = false,
   })  : itemCount = null,
-        builder = null,
-        super(key: key);
+        builder = null;
 
   /// Construct a gallery with dynamic items.
   ///
   /// The builder must return a [PhotoViewGalleryPageOptions].
   const PhotoViewGallery.builder({
-    Key? key,
-    required this.itemCount,
-    required this.builder,
+    super.key,
+    required int this.itemCount,
+    required PhotoViewGalleryBuilder this.builder,
     this.loadingBuilder,
     this.backgroundDecoration,
     this.wantKeepAlive = false,
@@ -141,10 +139,7 @@ class PhotoViewGallery extends StatefulWidget {
     this.scrollDirection = Axis.horizontal,
     this.customSize,
     this.allowImplicitScrolling = false,
-  })  : pageOptions = null,
-        assert(itemCount != null),
-        assert(builder != null),
-        super(key: key);
+  }) : pageOptions = null;
 
   /// A list of options to describe the items in the gallery
   final List<PhotoViewGalleryPageOptions>? pageOptions;
@@ -207,9 +202,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
       widget.pageController ?? PageController();
 
   void scaleStateChangedCallback(PhotoViewScaleState scaleState) {
-    if (widget.scaleStateChangedCallback != null) {
-      widget.scaleStateChangedCallback!(scaleState);
-    }
+    widget.scaleStateChangedCallback?.call(scaleState);
   }
 
   int get actualPage {
@@ -245,10 +238,9 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
     final pageOption = _buildPageOption(context, index);
     final isCustomChild = pageOption.child != null;
 
-    final PhotoView photoView = isCustomChild
+    final photoView = isCustomChild
         ? PhotoView.customChild(
             key: ObjectKey(index),
-            child: pageOption.child,
             childSize: pageOption.childSize,
             backgroundDecoration: widget.backgroundDecoration,
             wantKeepAlive: widget.wantKeepAlive,
@@ -270,6 +262,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             filterQuality: pageOption.filterQuality,
             basePosition: pageOption.basePosition,
             disableGestures: pageOption.disableGestures,
+            child: pageOption.child,
           )
         : PhotoView(
             key: ObjectKey(index),
@@ -306,7 +299,9 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
   }
 
   PhotoViewGalleryPageOptions _buildPageOption(
-      BuildContext context, int index) {
+    BuildContext context,
+    int index,
+  ) {
     if (widget._isBuilder) {
       return widget.builder!(context, index);
     }
@@ -320,8 +315,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
 ///
 class PhotoViewGalleryPageOptions {
   PhotoViewGalleryPageOptions({
-    Key? key,
-    required this.imageProvider,
+    required ImageProvider this.imageProvider,
     this.heroAttributes,
     this.semanticLabel,
     this.minScale,
@@ -340,8 +334,7 @@ class PhotoViewGalleryPageOptions {
     this.disableGestures,
     this.errorBuilder,
   })  : child = null,
-        childSize = null,
-        assert(imageProvider != null);
+        childSize = null;
 
   PhotoViewGalleryPageOptions.customChild({
     required this.child,

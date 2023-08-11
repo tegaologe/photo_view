@@ -5,8 +5,10 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view_example/screens/common/app_bar.dart';
 
 class ControllerExample extends StatefulWidget {
+  const ControllerExample({super.key});
+
   @override
-  _ControllerExampleState createState() => _ControllerExampleState();
+  State<ControllerExample> createState() => _ControllerExampleState();
 }
 
 const double min = pi * -2;
@@ -39,7 +41,7 @@ class _ControllerExampleState extends State<ControllerExample> {
   }
 
   void onScaleState(PhotoViewScaleState scaleState) {
-    print(scaleState);
+    debugPrint('$scaleState');
   }
 
   @override
@@ -88,11 +90,14 @@ class _ControllerExampleState extends State<ControllerExample> {
     );
   }
 
-  Widget _streamBuild(BuildContext context, AsyncSnapshot snapshot) {
+  Widget _streamBuild(
+    BuildContext context,
+    AsyncSnapshot<PhotoViewControllerValue> snapshot,
+  ) {
     if (snapshot.hasError || !snapshot.hasData) {
       return Container();
     }
-    final PhotoViewControllerValue value = snapshot.data;
+    final value = snapshot.data!;
     return Column(
       children: <Widget>[
         Text(

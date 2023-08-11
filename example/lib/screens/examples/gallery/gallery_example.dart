@@ -6,8 +6,10 @@ import 'package:photo_view_example/screens/common/app_bar.dart';
 import 'package:photo_view_example/screens/examples/gallery/gallery_example_item.dart';
 
 class GalleryExample extends StatefulWidget {
+  const GalleryExample({super.key});
+
   @override
-  _GalleryExampleState createState() => _GalleryExampleState();
+  State<GalleryExample> createState() => _GalleryExampleState();
 }
 
 class _GalleryExampleState extends State<GalleryExample> {
@@ -65,7 +67,7 @@ class _GalleryExampleState extends State<GalleryExample> {
     );
   }
 
-  void open(BuildContext context, final int index) {
+  void open(BuildContext context, int index) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -84,6 +86,7 @@ class _GalleryExampleState extends State<GalleryExample> {
 
 class GalleryPhotoViewWrapper extends StatefulWidget {
   GalleryPhotoViewWrapper({
+    super.key,
     this.loadingBuilder,
     this.backgroundDecoration,
     this.minScale,
@@ -145,7 +148,6 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17.0,
-                  decoration: null,
                 ),
               ),
             )
@@ -156,10 +158,10 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
   }
 
   PhotoViewGalleryPageOptions _buildItem(BuildContext context, int index) {
-    final GalleryExampleItem item = widget.galleryItems[index];
+    final item = widget.galleryItems[index];
     return item.isSvg
         ? PhotoViewGalleryPageOptions.customChild(
-            child: Container(
+            child: SizedBox(
               width: 300,
               height: 300,
               child: SvgPicture.asset(

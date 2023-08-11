@@ -3,6 +3,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view_example/screens/common/app_bar.dart';
 
 class InlineExample extends StatelessWidget {
+  const InlineExample({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ExampleAppBarLayout(
@@ -14,7 +16,7 @@ class InlineExample extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: const Text(
               "Example of usage in a contained context",
-              style: const TextStyle(fontSize: 18.0),
+              style: TextStyle(fontSize: 18.0),
             ),
           ),
           Container(

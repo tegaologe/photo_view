@@ -41,13 +41,13 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
       controller.setScaleInvisibly(scale);
       return;
     }
-    final double prevScale = controller.scale ??
+    final prevScale = controller.scale ??
         getScaleForScaleState(
           scaleStateController.prevScaleState,
           scaleBoundaries,
         );
 
-    final double nextScale = getScaleForScaleState(
+    final nextScale = getScaleForScaleState(
       scaleStateController.scaleState,
       scaleBoundaries,
     );
@@ -55,8 +55,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     _animateScale!(prevScale, nextScale);
   }
 
+  // ignore: use_setters_to_change_properties
   void addAnimateOnScaleStateUpdate(
-    void animateScale(double prevScale, double nextScale),
+    void Function(double prevScale, double nextScale) animateScale,
   ) {
     _animateScale = animateScale;
   }
@@ -68,10 +69,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     if (controller.scale == controller.prevValue.scale) {
       return;
     }
-    final PhotoViewScaleState newScaleState =
-        (scale > scaleBoundaries.initialScale)
-            ? PhotoViewScaleState.zoomedIn
-            : PhotoViewScaleState.zoomedOut;
+    final newScaleState = (scale > scaleBoundaries.initialScale)
+        ? PhotoViewScaleState.zoomedIn
+        : PhotoViewScaleState.zoomedOut;
 
     scaleStateController.setInvisibly(newScaleState);
   }
@@ -113,7 +113,7 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void updateScaleStateFromNewScale(double newScale) {
-    PhotoViewScaleState newScaleState = PhotoViewScaleState.initial;
+    var newScaleState = PhotoViewScaleState.initial;
     if (scale != scaleBoundaries.initialScale) {
       newScaleState = (newScale > scaleBoundaries.initialScale)
           ? PhotoViewScaleState.zoomedIn
@@ -123,21 +123,21 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void nextScaleState() {
-    final PhotoViewScaleState scaleState = scaleStateController.scaleState;
+    final scaleState = scaleStateController.scaleState;
     if (scaleState == PhotoViewScaleState.zoomedIn ||
         scaleState == PhotoViewScaleState.zoomedOut) {
       scaleStateController.scaleState = scaleStateCycle(scaleState);
       return;
     }
-    final double originalScale = getScaleForScaleState(
+    final originalScale = getScaleForScaleState(
       scaleState,
       scaleBoundaries,
     );
 
-    double prevScale = originalScale;
-    PhotoViewScaleState prevScaleState = scaleState;
-    double nextScale = originalScale;
-    PhotoViewScaleState nextScaleState = scaleState;
+    var prevScale = originalScale;
+    var prevScaleState = scaleState;
+    var nextScale = originalScale;
+    var nextScaleState = scaleState;
 
     do {
       prevScale = nextScale;
@@ -153,53 +153,53 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   CornersRange cornersX({double? scale}) {
-    final double _scale = scale ?? this.scale;
+    final scale0 = scale ?? this.scale;
 
-    final double computedWidth = scaleBoundaries.childSize.width * _scale;
-    final double screenWidth = scaleBoundaries.outerSize.width;
+    final computedWidth = scaleBoundaries.childSize.width * scale0;
+    final screenWidth = scaleBoundaries.outerSize.width;
 
-    final double positionX = basePosition.x;
-    final double widthDiff = computedWidth - screenWidth;
+    final positionX = basePosition.x;
+    final widthDiff = computedWidth - screenWidth;
 
-    final double minX = ((positionX - 1).abs() / 2) * widthDiff * -1;
-    final double maxX = ((positionX + 1).abs() / 2) * widthDiff;
+    final minX = ((positionX - 1).abs() / 2) * widthDiff * -1;
+    final maxX = ((positionX + 1).abs() / 2) * widthDiff;
     return CornersRange(minX, maxX);
   }
 
   CornersRange cornersY({double? scale}) {
-    final double _scale = scale ?? this.scale;
+    final scale0 = scale ?? this.scale;
 
-    final double computedHeight = scaleBoundaries.childSize.height * _scale;
-    final double screenHeight = scaleBoundaries.outerSize.height;
+    final computedHeight = scaleBoundaries.childSize.height * scale0;
+    final screenHeight = scaleBoundaries.outerSize.height;
 
-    final double positionY = basePosition.y;
-    final double heightDiff = computedHeight - screenHeight;
+    final positionY = basePosition.y;
+    final heightDiff = computedHeight - screenHeight;
 
-    final double minY = ((positionY - 1).abs() / 2) * heightDiff * -1;
-    final double maxY = ((positionY + 1).abs() / 2) * heightDiff;
+    final minY = ((positionY - 1).abs() / 2) * heightDiff * -1;
+    final maxY = ((positionY + 1).abs() / 2) * heightDiff;
     return CornersRange(minY, maxY);
   }
 
   Offset clampPosition({Offset? position, double? scale}) {
-    final double _scale = scale ?? this.scale;
-    final Offset _position = position ?? this.position;
+    final scale0 = scale ?? this.scale;
+    final position0 = position ?? this.position;
 
-    final double computedWidth = scaleBoundaries.childSize.width * _scale;
-    final double computedHeight = scaleBoundaries.childSize.height * _scale;
+    final computedWidth = scaleBoundaries.childSize.width * scale0;
+    final computedHeight = scaleBoundaries.childSize.height * scale0;
 
-    final double screenWidth = scaleBoundaries.outerSize.width;
-    final double screenHeight = scaleBoundaries.outerSize.height;
+    final screenWidth = scaleBoundaries.outerSize.width;
+    final screenHeight = scaleBoundaries.outerSize.height;
 
-    double finalX = 0.0;
+    var finalX = 0.0;
     if (screenWidth < computedWidth) {
-      final cornersX = this.cornersX(scale: _scale);
-      finalX = _position.dx.clamp(cornersX.min, cornersX.max);
+      final cornersX = this.cornersX(scale: scale0);
+      finalX = position0.dx.clamp(cornersX.min, cornersX.max);
     }
 
-    double finalY = 0.0;
+    var finalY = 0.0;
     if (screenHeight < computedHeight) {
-      final cornersY = this.cornersY(scale: _scale);
-      finalY = _position.dy.clamp(cornersY.min, cornersY.max);
+      final cornersY = this.cornersY(scale: scale0);
+      finalY = position0.dy.clamp(cornersY.min, cornersY.max);
     }
 
     return Offset(finalX, finalY);

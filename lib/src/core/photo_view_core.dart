@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart'
     show
-        PhotoViewScaleState,
         PhotoViewHeroAttributes,
+        PhotoViewImageScaleEndCallback,
         PhotoViewImageTapDownCallback,
         PhotoViewImageTapUpCallback,
-        PhotoViewImageScaleEndCallback,
+        PhotoViewScaleState,
         ScaleStateCycle;
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
@@ -14,15 +14,15 @@ import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
 
-const _defaultDecoration = const BoxDecoration(
-  color: const Color.fromRGBO(0, 0, 0, 1.0),
+const _defaultDecoration = BoxDecoration(
+  color: Color.fromRGBO(0, 0, 0, 1.0),
 );
 
 /// Internal widget in which controls all animations lifecycle, core responses
 /// to user gestures, updates to  the controller state and mounts the entire PhotoView Layout
 class PhotoViewCore extends StatefulWidget {
   const PhotoViewCore({
-    Key? key,
+    super.key,
     required this.imageProvider,
     required this.backgroundDecoration,
     required this.semanticLabel,
@@ -43,11 +43,10 @@ class PhotoViewCore extends StatefulWidget {
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
-  })  : customChild = null,
-        super(key: key);
+  }) : customChild = null;
 
   const PhotoViewCore.customChild({
-    Key? key,
+    super.key,
     required this.customChild,
     required this.backgroundDecoration,
     this.heroAttributes,
@@ -68,8 +67,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.strictScale,
   })  : imageProvider = null,
         semanticLabel = null,
-        gaplessPlayback = false,
-        super(key: key);
+        gaplessPlayback = false;
 
   final Decoration? backgroundDecoration;
   final ImageProvider? imageProvider;
@@ -110,34 +108,34 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         TickerProviderStateMixin,
         PhotoViewControllerDelegate,
         HitCornersDetector {
-  Offset? _normalizedPosition;
-  double? _scaleBefore;
-  double? _rotationBefore;
+  late Offset _normalizedPosition;
+  late double _scaleBefore;
+  late double _rotationBefore;
 
   late final AnimationController _scaleAnimationController;
-  Animation<double>? _scaleAnimation;
+  late Animation<double> _scaleAnimation;
 
   late final AnimationController _positionAnimationController;
-  Animation<Offset>? _positionAnimation;
+  late Animation<Offset> _positionAnimation;
 
-  late final AnimationController _rotationAnimationController =
-      AnimationController(vsync: this)..addListener(handleRotationAnimation);
-  Animation<double>? _rotationAnimation;
+  late final _rotationAnimationController = AnimationController(vsync: this)
+    ..addListener(handleRotationAnimation);
+  late Animation<double> _rotationAnimation;
 
   PhotoViewHeroAttributes? get heroAttributes => widget.heroAttributes;
 
   late ScaleBoundaries cachedScaleBoundaries = widget.scaleBoundaries;
 
   void handleScaleAnimation() {
-    scale = _scaleAnimation!.value;
+    scale = _scaleAnimation.value;
   }
 
   void handlePositionAnimate() {
-    controller.position = _positionAnimation!.value;
+    controller.position = _positionAnimation.value;
   }
 
   void handleRotationAnimation() {
-    controller.rotation = _rotationAnimation!.value;
+    controller.rotation = _rotationAnimation.value;
   }
 
   void onScaleStart(ScaleStartDetails details) {
@@ -150,11 +148,12 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
-    final double newScale = _scaleBefore! * details.scale;
-    final Offset delta = details.focalPoint - _normalizedPosition!;
+    final newScale = _scaleBefore * details.scale;
+    final delta = details.focalPoint - _normalizedPosition;
 
-    if (widget.strictScale && (newScale > widget.scaleBoundaries.maxScale ||
-        newScale < widget.scaleBoundaries.minScale)) {
+    if (widget.strictScale &&
+        (newScale > widget.scaleBoundaries.maxScale ||
+            newScale < widget.scaleBoundaries.minScale)) {
       return;
     }
 
@@ -166,53 +165,53 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           ? delta
           : clampPosition(position: delta * details.scale),
       rotation:
-          widget.enableRotation ? _rotationBefore! + details.rotation : null,
+          widget.enableRotation ? _rotationBefore + details.rotation : null,
       rotationFocusPoint: widget.enableRotation ? details.focalPoint : null,
     );
   }
 
   void onScaleEnd(ScaleEndDetails details) {
-    final double _scale = scale;
-    final Offset _position = controller.position;
-    final double maxScale = scaleBoundaries.maxScale;
-    final double minScale = scaleBoundaries.minScale;
+    final scale = this.scale;
+    final position = controller.position;
+    final maxScale = scaleBoundaries.maxScale;
+    final minScale = scaleBoundaries.minScale;
 
     widget.onScaleEnd?.call(context, details, controller.value);
 
     //animate back to maxScale if gesture exceeded the maxScale specified
-    if (_scale > maxScale) {
-      final double scaleComebackRatio = maxScale / _scale;
-      animateScale(_scale, maxScale);
-      final Offset clampedPosition = clampPosition(
-        position: _position * scaleComebackRatio,
+    if (scale > maxScale) {
+      final scaleComebackRatio = maxScale / scale;
+      animateScale(scale, maxScale);
+      final clampedPosition = clampPosition(
+        position: position * scaleComebackRatio,
         scale: maxScale,
       );
-      animatePosition(_position, clampedPosition);
+      animatePosition(position, clampedPosition);
       return;
     }
 
     //animate back to minScale if gesture fell smaller than the minScale specified
-    if (_scale < minScale) {
-      final double scaleComebackRatio = minScale / _scale;
-      animateScale(_scale, minScale);
+    if (scale < minScale) {
+      final scaleComebackRatio = minScale / scale;
+      animateScale(scale, minScale);
       animatePosition(
-        _position,
+        position,
         clampPosition(
-          position: _position * scaleComebackRatio,
+          position: position * scaleComebackRatio,
           scale: minScale,
         ),
       );
       return;
     }
     // get magnitude from gesture velocity
-    final double magnitude = details.velocity.pixelsPerSecond.distance;
+    final magnitude = details.velocity.pixelsPerSecond.distance;
 
     // animate velocity only if there is no scale change and a significant magnitude
-    if (_scaleBefore! / _scale == 1.0 && magnitude >= 400.0) {
-      final Offset direction = details.velocity.pixelsPerSecond / magnitude;
+    if (_scaleBefore / scale == 1.0 && magnitude >= 400.0) {
+      final direction = details.velocity.pixelsPerSecond / magnitude;
       animatePosition(
-        _position,
-        clampPosition(position: _position + direction * 100.0),
+        position,
+        clampPosition(position: position + direction * 100.0),
       );
     }
   }
@@ -308,68 +307,69 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     }
 
     return StreamBuilder(
-        stream: controller.outputStateStream,
-        initialData: controller.prevValue,
-        builder: (
-          BuildContext context,
-          AsyncSnapshot<PhotoViewControllerValue> snapshot,
-        ) {
-          if (snapshot.hasData) {
-            final PhotoViewControllerValue value = snapshot.data!;
-            final useImageScale = widget.filterQuality != FilterQuality.none;
+      stream: controller.outputStateStream,
+      initialData: controller.prevValue,
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<PhotoViewControllerValue> snapshot,
+      ) {
+        if (snapshot.hasData) {
+          final value = snapshot.data!;
+          final useImageScale = widget.filterQuality != FilterQuality.none;
 
-            final computedScale = useImageScale ? 1.0 : scale;
+          final computedScale = useImageScale ? 1.0 : scale;
 
-            final matrix = Matrix4.identity()
-              ..translate(value.position.dx, value.position.dy)
-              ..scale(computedScale)
-              ..rotateZ(value.rotation);
+          final matrix = Matrix4.identity()
+            ..translate(value.position.dx, value.position.dy)
+            ..scale(computedScale)
+            ..rotateZ(value.rotation);
 
-            final Widget customChildLayout = CustomSingleChildLayout(
-              delegate: _CenterWithOriginalSizeDelegate(
-                scaleBoundaries.childSize,
-                basePosition,
-                useImageScale,
+          final Widget customChildLayout = CustomSingleChildLayout(
+            delegate: _CenterWithOriginalSizeDelegate(
+              scaleBoundaries.childSize,
+              basePosition,
+              useImageScale,
+            ),
+            child: _buildHero(),
+          );
+
+          final child = Container(
+            constraints: widget.tightMode
+                ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
+                : null,
+            decoration: widget.backgroundDecoration ?? _defaultDecoration,
+            child: Center(
+              child: Transform(
+                transform: matrix,
+                alignment: basePosition,
+                child: customChildLayout,
               ),
-              child: _buildHero(),
-            );
+            ),
+          );
 
-            final child = Container(
-              constraints: widget.tightMode
-                  ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
-                  : null,
-              child: Center(
-                child: Transform(
-                  child: customChildLayout,
-                  transform: matrix,
-                  alignment: basePosition,
-                ),
-              ),
-              decoration: widget.backgroundDecoration ?? _defaultDecoration,
-            );
-
-            if (widget.disableGestures) {
-              return child;
-            }
-
-            return PhotoViewGestureDetector(
-              child: child,
-              onDoubleTap: nextScaleState,
-              onScaleStart: onScaleStart,
-              onScaleUpdate: onScaleUpdate,
-              onScaleEnd: onScaleEnd,
-              hitDetector: this,
-              onTapUp: widget.onTapUp != null
-                  ? (details) => widget.onTapUp!(context, details, value)
-                  : null,
-              onTapDown: widget.onTapDown != null
-                  ? (details) => widget.onTapDown!(context, details, value)
-                  : null,
-            );
-          } else {
-            return Container();
+          if (widget.disableGestures) {
+            return child;
           }
-        });
+
+          return PhotoViewGestureDetector(
+            onDoubleTap: nextScaleState,
+            onScaleStart: onScaleStart,
+            onScaleUpdate: onScaleUpdate,
+            onScaleEnd: onScaleEnd,
+            hitDetector: this,
+            onTapUp: widget.onTapUp != null
+                ? (details) => widget.onTapUp!(context, details, value)
+                : null,
+            onTapDown: widget.onTapDown != null
+                ? (details) => widget.onTapDown!(context, details, value)
+                : null,
+            child: child,
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
   Widget _buildHero() {
@@ -418,8 +418,8 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
     final halfWidth = (size.width - childWidth) / 2;
     final halfHeight = (size.height - childHeight) / 2;
 
-    final double offsetX = halfWidth * (basePosition.x + 1);
-    final double offsetY = halfHeight * (basePosition.y + 1);
+    final offsetX = halfWidth * (basePosition.x + 1);
+    final offsetY = halfHeight * (basePosition.y + 1);
     return Offset(offsetX, offsetY);
   }
 

@@ -16,9 +16,12 @@ double getScaleForScaleState(
       return _clampSize(scaleBoundaries.initialScale, scaleBoundaries);
     case PhotoViewScaleState.covering:
       return _clampSize(
-          _scaleForCovering(
-              scaleBoundaries.outerSize, scaleBoundaries.childSize),
-          scaleBoundaries);
+        _scaleForCovering(
+          scaleBoundaries.outerSize,
+          scaleBoundaries.childSize,
+        ),
+        scaleBoundaries,
+      );
     case PhotoViewScaleState.originalSize:
       return _clampSize(1.0, scaleBoundaries);
     // Will never be reached
@@ -54,8 +57,8 @@ class ScaleBoundaries {
       return _scaleForCovering(outerSize, childSize) *
           (_minScale as PhotoViewComputedScale).multiplier; // ignore: avoid_as
     }
-    assert(_minScale >= 0.0);
-    return _minScale;
+    assert(_minScale as double >= 0.0);
+    return _minScale as double;
   }
 
   double get maxScale {
@@ -72,7 +75,7 @@ class ScaleBoundaries {
                   .multiplier)
           .clamp(minScale, double.infinity);
     }
-    return _maxScale.clamp(minScale, double.infinity);
+    return (_maxScale as double).clamp(minScale, double.infinity);
   }
 
   double get initialScale {
@@ -87,7 +90,7 @@ class ScaleBoundaries {
           (_initialScale as PhotoViewComputedScale) // ignore: avoid_as
               .multiplier;
     }
-    return _initialScale.clamp(minScale, maxScale);
+    return (_initialScale as double).clamp(minScale, maxScale);
   }
 
   @override
@@ -111,21 +114,21 @@ class ScaleBoundaries {
 }
 
 double _scaleForContained(Size size, Size childSize) {
-  final double imageWidth = childSize.width;
-  final double imageHeight = childSize.height;
+  final imageWidth = childSize.width;
+  final imageHeight = childSize.height;
 
-  final double screenWidth = size.width;
-  final double screenHeight = size.height;
+  final screenWidth = size.width;
+  final screenHeight = size.height;
 
   return math.min(screenWidth / imageWidth, screenHeight / imageHeight);
 }
 
 double _scaleForCovering(Size size, Size childSize) {
-  final double imageWidth = childSize.width;
-  final double imageHeight = childSize.height;
+  final imageWidth = childSize.width;
+  final imageHeight = childSize.height;
 
-  final double screenWidth = size.width;
-  final double screenHeight = size.height;
+  final screenWidth = size.width;
+  final screenHeight = size.height;
 
   return math.max(screenWidth / imageWidth, screenHeight / imageHeight);
 }

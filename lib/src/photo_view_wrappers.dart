@@ -1,13 +1,12 @@
 import 'package:flutter/widgets.dart';
-
-import '../photo_view.dart';
-import 'core/photo_view_core.dart';
-import 'photo_view_default_widgets.dart';
-import 'utils/photo_view_utils.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/src/core/photo_view_core.dart';
+import 'package:photo_view/src/photo_view_default_widgets.dart';
+import 'package:photo_view/src/utils/photo_view_utils.dart';
 
 class ImageWrapper extends StatefulWidget {
   const ImageWrapper({
-    Key? key,
+    super.key,
     required this.imageProvider,
     required this.loadingBuilder,
     required this.backgroundDecoration,
@@ -34,7 +33,7 @@ class ImageWrapper extends StatefulWidget {
     required this.errorBuilder,
     required this.enablePanAlways,
     required this.strictScale,
-  }) : super(key: key);
+  });
 
   final ImageProvider imageProvider;
   final LoadingBuilder? loadingBuilder;
@@ -64,16 +63,16 @@ class ImageWrapper extends StatefulWidget {
   final bool? strictScale;
 
   @override
-  _ImageWrapperState createState() => _ImageWrapperState();
+  State<ImageWrapper> createState() => _ImageWrapperState();
 }
 
 class _ImageWrapperState extends State<ImageWrapper> {
-  ImageStreamListener? _imageStreamListener;
+  late ImageStreamListener _imageStreamListener;
   ImageStream? _imageStream;
   ImageChunkEvent? _loadingProgress;
   ImageInfo? _imageInfo;
   bool _loading = true;
-  Size? _imageSize;
+  late Size _imageSize;
   Object? _lastException;
   StackTrace? _lastStack;
 
@@ -99,9 +98,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
 
   // retrieve image from the provider
   void _resolveImage() {
-    final ImageStream newStream = widget.imageProvider.resolve(
-      const ImageConfiguration(),
-    );
+    final newStream = widget.imageProvider.resolve(ImageConfiguration.empty);
     _updateSourceStream(newStream);
   }
 
@@ -114,7 +111,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
     }
 
     void handleImageFrame(ImageInfo info, bool synchronousCall) {
-      final setupCB = () {
+      void setupCB() {
         _imageSize = Size(
           info.image.width.toDouble(),
           info.image.height.toDouble(),
@@ -125,11 +122,12 @@ class _ImageWrapperState extends State<ImageWrapper> {
         _loadingProgress = null;
         _lastException = null;
         _lastStack = null;
-      };
+      }
+
       synchronousCall ? setupCB() : setState(setupCB);
     }
 
-    void handleError(dynamic error, StackTrace? stackTrace) {
+    void handleError(Object error, StackTrace? stackTrace) {
       setState(() {
         _loading = false;
         _lastException = error;
@@ -143,26 +141,24 @@ class _ImageWrapperState extends State<ImageWrapper> {
       }());
     }
 
-    _imageStreamListener = ImageStreamListener(
+    return _imageStreamListener = ImageStreamListener(
       handleImageFrame,
       onChunk: handleImageChunk,
       onError: handleError,
     );
-
-    return _imageStreamListener!;
   }
 
   void _updateSourceStream(ImageStream newStream) {
     if (_imageStream?.key == newStream.key) {
       return;
     }
-    _imageStream?.removeListener(_imageStreamListener!);
+    _imageStream?.removeListener(_imageStreamListener);
     _imageStream = newStream;
     _imageStream!.addListener(_getOrCreateListener());
   }
 
   void _stopImageStream() {
-    _imageStream?.removeListener(_imageStreamListener!);
+    _imageStream?.removeListener(_imageStreamListener);
   }
 
   @override
@@ -180,7 +176,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
       widget.maxScale ?? double.infinity,
       widget.initialScale ?? PhotoViewComputedScale.contained,
       widget.outerSize,
-      _imageSize!,
+      _imageSize,
     );
 
     return PhotoViewCore(
@@ -231,7 +227,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
 
 class CustomChildWrapper extends StatelessWidget {
   const CustomChildWrapper({
-    Key? key,
+    super.key,
     this.child,
     required this.childSize,
     required this.backgroundDecoration,
@@ -255,7 +251,7 @@ class CustomChildWrapper extends StatelessWidget {
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
-  }) : super(key: key);
+  });
 
   final Widget? child;
   final Size? childSize;

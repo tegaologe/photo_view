@@ -14,10 +14,10 @@ class GalleryExampleItem {
 
 class GalleryExampleItemThumbnail extends StatelessWidget {
   const GalleryExampleItemThumbnail({
-    Key? key,
+    super.key,
     required this.galleryExampleItem,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   final GalleryExampleItem galleryExampleItem;
 
