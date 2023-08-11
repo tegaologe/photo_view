@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
 
 class PhotoViewGestureDetector extends StatelessWidget {
@@ -34,50 +33,45 @@ class PhotoViewGestureDetector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scope = PhotoViewGestureDetectorScope.of(context);
-
     final axis = scope?.axis;
-
-    final gestures = <Type, GestureRecognizerFactory>{};
-
-    if (onTapDown != null || onTapUp != null) {
-      gestures[TapGestureRecognizer] =
-          GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
-        () => TapGestureRecognizer(debugOwner: this),
-        (TapGestureRecognizer instance) {
-          instance
-            ..onTapDown = onTapDown
-            ..onTapUp = onTapUp;
-        },
-      );
-    }
-
-    gestures[DoubleTapGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
-      () => DoubleTapGestureRecognizer(debugOwner: this),
-      (DoubleTapGestureRecognizer instance) {
-        instance.onDoubleTap = onDoubleTap;
-      },
-    );
-
-    gestures[PhotoViewGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
-      () => PhotoViewGestureRecognizer(
-        hitDetector: hitDetector,
-        debugOwner: this,
-        validateAxis: axis,
-      ),
-      (PhotoViewGestureRecognizer instance) {
-        instance
-          ..dragStartBehavior = DragStartBehavior.start
-          ..onStart = onScaleStart
-          ..onUpdate = onScaleUpdate
-          ..onEnd = onScaleEnd;
-      },
-    );
 
     return RawGestureDetector(
       behavior: behavior,
-      gestures: gestures,
+      gestures: {
+        if (onTapDown != null || onTapUp != null)
+          TapGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+            () => TapGestureRecognizer(debugOwner: this),
+            (TapGestureRecognizer instance) {
+              instance
+                ..onTapDown = onTapDown
+                ..onTapUp = onTapUp;
+            },
+          ),
+        if (onDoubleTap != null)
+          DoubleTapGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
+            () => DoubleTapGestureRecognizer(debugOwner: this),
+            (DoubleTapGestureRecognizer instance) {
+              instance.onDoubleTap = onDoubleTap;
+            },
+          ),
+        PhotoViewGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
+          () => PhotoViewGestureRecognizer(
+            hitDetector: hitDetector,
+            debugOwner: this,
+            validateAxis: axis,
+          ),
+          (PhotoViewGestureRecognizer instance) {
+            instance
+              ..dragStartBehavior = DragStartBehavior.start
+              ..onStart = onScaleStart
+              ..onUpdate = onScaleUpdate
+              ..onEnd = onScaleEnd;
+          },
+        ),
+      },
       child: child,
     );
   }
