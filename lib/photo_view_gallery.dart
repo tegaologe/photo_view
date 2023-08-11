@@ -261,6 +261,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             tightMode: pageOption.tightMode,
             filterQuality: pageOption.filterQuality,
             basePosition: pageOption.basePosition,
+            disableDoubleTap: pageOption.disableDoubleTap,
             disableGestures: pageOption.disableGestures,
             child: pageOption.child,
           )
@@ -289,6 +290,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             tightMode: pageOption.tightMode,
             filterQuality: pageOption.filterQuality,
             basePosition: pageOption.basePosition,
+            disableDoubleTap: pageOption.disableDoubleTap,
             disableGestures: pageOption.disableGestures,
             errorBuilder: pageOption.errorBuilder,
           );
@@ -331,6 +333,7 @@ class PhotoViewGalleryPageOptions {
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
+    this.disableDoubleTap = false,
     this.disableGestures,
     this.errorBuilder,
   })  : child = null,
@@ -354,6 +357,7 @@ class PhotoViewGalleryPageOptions {
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
+    this.disableDoubleTap = false,
     this.disableGestures,
   })  : errorBuilder = null,
         imageProvider = null;
@@ -408,6 +412,8 @@ class PhotoViewGalleryPageOptions {
 
   /// Mirror to [PhotoView.tightMode]
   final bool? tightMode;
+
+  final bool disableDoubleTap;
 
   /// Mirror to [PhotoView.disableGestures]
   final bool? disableGestures;

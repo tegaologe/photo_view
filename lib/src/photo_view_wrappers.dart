@@ -29,6 +29,7 @@ class ImageWrapper extends StatefulWidget {
     required this.gestureDetectorBehavior,
     required this.tightMode,
     required this.filterQuality,
+    required this.disableDoubleTap,
     required this.disableGestures,
     required this.errorBuilder,
     required this.enablePanAlways,
@@ -58,6 +59,7 @@ class ImageWrapper extends StatefulWidget {
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
   final FilterQuality? filterQuality;
+  final bool disableDoubleTap;
   final bool? disableGestures;
   final bool? enablePanAlways;
   final bool? strictScale;
@@ -198,6 +200,7 @@ class _ImageWrapperState extends State<ImageWrapper> {
       gestureDetectorBehavior: widget.gestureDetectorBehavior,
       tightMode: widget.tightMode ?? false,
       filterQuality: widget.filterQuality ?? FilterQuality.none,
+      disableDoubleTap: widget.disableDoubleTap,
       disableGestures: widget.disableGestures ?? false,
       enablePanAlways: widget.enablePanAlways ?? false,
     );
@@ -248,6 +251,7 @@ class CustomChildWrapper extends StatelessWidget {
     this.gestureDetectorBehavior,
     required this.tightMode,
     required this.filterQuality,
+    required this.disableDoubleTap,
     required this.disableGestures,
     required this.enablePanAlways,
     required this.strictScale,
@@ -276,6 +280,7 @@ class CustomChildWrapper extends StatelessWidget {
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
   final FilterQuality? filterQuality;
+  final bool disableDoubleTap;
   final bool? disableGestures;
   final bool? enablePanAlways;
   final bool? strictScale;
@@ -307,6 +312,7 @@ class CustomChildWrapper extends StatelessWidget {
       gestureDetectorBehavior: gestureDetectorBehavior,
       tightMode: tightMode ?? false,
       filterQuality: filterQuality ?? FilterQuality.none,
+      disableDoubleTap: disableDoubleTap,
       disableGestures: disableGestures ?? false,
       enablePanAlways: enablePanAlways ?? false,
     );

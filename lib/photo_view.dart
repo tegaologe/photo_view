@@ -256,6 +256,7 @@ class PhotoView extends StatefulWidget {
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
+    this.disableDoubleTap = false,
     this.disableGestures,
     this.errorBuilder,
     this.enablePanAlways,
@@ -292,6 +293,7 @@ class PhotoView extends StatefulWidget {
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
+    this.disableDoubleTap = false,
     this.disableGestures,
     this.enablePanAlways,
     this.strictScale,
@@ -398,6 +400,8 @@ class PhotoView extends StatefulWidget {
 
   /// Quality levels for image filters.
   final FilterQuality? filterQuality;
+
+  final bool disableDoubleTap;
 
   // Removes gesture detector if `true`.
   // Useful when custom gesture detector is used in child widget.
@@ -525,6 +529,7 @@ class _PhotoViewState extends State<PhotoView>
                 gestureDetectorBehavior: widget.gestureDetectorBehavior,
                 tightMode: widget.tightMode,
                 filterQuality: widget.filterQuality,
+                disableDoubleTap: widget.disableDoubleTap,
                 disableGestures: widget.disableGestures,
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
@@ -553,6 +558,7 @@ class _PhotoViewState extends State<PhotoView>
                 gestureDetectorBehavior: widget.gestureDetectorBehavior,
                 tightMode: widget.tightMode,
                 filterQuality: widget.filterQuality,
+                disableDoubleTap: widget.disableDoubleTap,
                 disableGestures: widget.disableGestures,
                 errorBuilder: widget.errorBuilder,
                 enablePanAlways: widget.enablePanAlways,

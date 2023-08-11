@@ -42,19 +42,15 @@ class PhotoViewGestureDetector extends StatelessWidget {
           TapGestureRecognizer:
               GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
             () => TapGestureRecognizer(debugOwner: this),
-            (TapGestureRecognizer instance) {
-              instance
-                ..onTapDown = onTapDown
-                ..onTapUp = onTapUp;
-            },
+            (instance) => instance
+              ..onTapDown = onTapDown
+              ..onTapUp = onTapUp,
           ),
         if (onDoubleTap != null)
           DoubleTapGestureRecognizer:
               GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
             () => DoubleTapGestureRecognizer(debugOwner: this),
-            (DoubleTapGestureRecognizer instance) {
-              instance.onDoubleTap = onDoubleTap;
-            },
+            (instance) => instance.onDoubleTap = onDoubleTap,
           ),
         PhotoViewGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
@@ -63,13 +59,11 @@ class PhotoViewGestureDetector extends StatelessWidget {
             debugOwner: this,
             validateAxis: axis,
           ),
-          (PhotoViewGestureRecognizer instance) {
-            instance
-              ..dragStartBehavior = DragStartBehavior.start
-              ..onStart = onScaleStart
-              ..onUpdate = onScaleUpdate
-              ..onEnd = onScaleEnd;
-          },
+          (instance) => instance
+            ..dragStartBehavior = DragStartBehavior.start
+            ..onStart = onScaleStart
+            ..onUpdate = onScaleUpdate
+            ..onEnd = onScaleEnd,
         ),
       },
       child: child,
@@ -83,6 +77,7 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     super.debugOwner,
     this.validateAxis,
   });
+
   final HitCornersDetector? hitDetector;
   final Axis? validateAxis;
 
