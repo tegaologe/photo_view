@@ -23,83 +23,7 @@ typedef PhotoViewGalleryBuilder = PhotoViewGalleryPageOptions Function(
   int index,
 );
 
-/// A [StatefulWidget] that shows multiple [PhotoView] widgets in a [PageView]
-///
-/// Some of [PhotoView] constructor options are passed direct to [PhotoViewGallery] constructor. Those options will affect the gallery in a whole.
-///
-/// Some of the options may be defined to each image individually, such as `initialScale` or `PhotoViewHeroAttributes`. Those must be passed via each [PhotoViewGalleryPageOptions].
-///
-/// Example of usage as a list of options:
-/// ```
-/// PhotoViewGallery(
-///   pageOptions: <PhotoViewGalleryPageOptions>[
-///     PhotoViewGalleryPageOptions(
-///       imageProvider: AssetImage("assets/gallery1.jpg"),
-///       heroAttributes: const PhotoViewHeroAttributes(tag: "tag1"),
-///     ),
-///     PhotoViewGalleryPageOptions(
-///       imageProvider: AssetImage("assets/gallery2.jpg"),
-///       heroAttributes: const PhotoViewHeroAttributes(tag: "tag2"),
-///       maxScale: PhotoViewComputedScale.contained * 0.3
-///     ),
-///     PhotoViewGalleryPageOptions(
-///       imageProvider: AssetImage("assets/gallery3.jpg"),
-///       minScale: PhotoViewComputedScale.contained * 0.8,
-///       maxScale: PhotoViewComputedScale.covered * 1.1,
-///       heroAttributes: const HeroAttributes(tag: "tag3"),
-///     ),
-///   ],
-///   loadingBuilder: (context, progress) => Center(
-///            child: Container(
-///              width: 20.0,
-///              height: 20.0,
-///              child: CircularProgressIndicator(
-///                value: _progress == null
-///                    ? null
-///                    : _progress.cumulativeBytesLoaded /
-///                        _progress.expectedTotalBytes,
-///              ),
-///            ),
-///          ),
-///   backgroundDecoration: widget.backgroundDecoration,
-///   pageController: widget.pageController,
-///   onPageChanged: onPageChanged,
-/// )
-/// ```
-///
-/// Example of usage with builder pattern:
-/// ```
-/// PhotoViewGallery.builder(
-///   scrollPhysics: const BouncingScrollPhysics(),
-///   builder: (BuildContext context, int index) {
-///     return PhotoViewGalleryPageOptions(
-///       imageProvider: AssetImage(widget.galleryItems[index].image),
-///       initialScale: PhotoViewComputedScale.contained * 0.8,
-///       minScale: PhotoViewComputedScale.contained * 0.8,
-///       maxScale: PhotoViewComputedScale.covered * 1.1,
-///       heroAttributes: HeroAttributes(tag: galleryItems[index].id),
-///     );
-///   },
-///   itemCount: galleryItems.length,
-///   loadingBuilder: (context, progress) => Center(
-///            child: Container(
-///              width: 20.0,
-///              height: 20.0,
-///              child: CircularProgressIndicator(
-///                value: _progress == null
-///                    ? null
-///                    : _progress.cumulativeBytesLoaded /
-///                        _progress.expectedTotalBytes,
-///              ),
-///            ),
-///          ),
-///   backgroundDecoration: widget.backgroundDecoration,
-///   pageController: widget.pageController,
-///   onPageChanged: onPageChanged,
-/// )
-/// ```
 class PhotoViewGallery extends StatefulWidget {
-  /// Construct a gallery with static items through a list of [PhotoViewGalleryPageOptions].
   const PhotoViewGallery({
     super.key,
     required this.pageOptions,
@@ -119,9 +43,6 @@ class PhotoViewGallery extends StatefulWidget {
   })  : itemCount = null,
         builder = null;
 
-  /// Construct a gallery with dynamic items.
-  ///
-  /// The builder must return a [PhotoViewGalleryPageOptions].
   const PhotoViewGallery.builder({
     super.key,
     required int this.itemCount,
@@ -218,7 +139,6 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
 
   @override
   Widget build(BuildContext context) {
-    // Enable corner hit test
     return PhotoViewGestureDetectorScope(
       axis: widget.scrollDirection,
       child: PageView.builder(
@@ -311,10 +231,6 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
   }
 }
 
-/// A helper class that wraps individual options of a page in [PhotoViewGallery]
-///
-/// The [maxScale], [minScale] and [initialScale] options may be [double] or a [PhotoViewComputedScale] constant
-///
 class PhotoViewGalleryPageOptions {
   PhotoViewGalleryPageOptions({
     required ImageProvider this.imageProvider,

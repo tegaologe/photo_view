@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
@@ -15,222 +17,7 @@ export 'src/photo_view_computed_scale.dart';
 export 'src/photo_view_scale_state.dart';
 export 'src/utils/photo_view_hero_attributes.dart';
 
-/// A [StatefulWidget] that contains all the photo view rendering elements.
-///
-/// Sample code to use within an image:
-///
-/// ```
-/// PhotoView(
-///  imageProvider: imageProvider,
-///  loadingBuilder: (context, progress) => Center(
-///            child: Container(
-///              width: 20.0,
-///              height: 20.0,
-///              child: CircularProgressIndicator(
-///                value: _progress == null
-///                    ? null
-///                    : _progress.cumulativeBytesLoaded /
-///                        _progress.expectedTotalBytes,
-///              ),
-///            ),
-///          ),
-///  backgroundDecoration: BoxDecoration(color: Colors.black),
-///  semanticLabel: 'Some label',
-///  gaplessPlayback: false,
-///  customSize: MediaQuery.of(context).size,
-///  heroAttributes: const HeroAttributes(
-///   tag: "someTag",
-///   transitionOnUserGestures: true,
-///  ),
-///  scaleStateChangedCallback: this.onScaleStateChanged,
-///  enableRotation: true,
-///  controller:  controller,
-///  minScale: PhotoViewComputedScale.contained * 0.8,
-///  maxScale: PhotoViewComputedScale.covered * 1.8,
-///  initialScale: PhotoViewComputedScale.contained,
-///  basePosition: Alignment.center,
-///  scaleStateCycle: scaleStateCycle
-/// );
-/// ```
-///
-/// You can customize to show an custom child instead of an image:
-///
-/// ```
-/// PhotoView.customChild(
-///  child: Container(
-///    width: 220.0,
-///    height: 250.0,
-///    child: const Text(
-///      "Hello there, this is a text",
-///    )
-///  ),
-///  childSize: const Size(220.0, 250.0),
-///  backgroundDecoration: BoxDecoration(color: Colors.black),
-///  semanticLabel: 'Some label',
-///  gaplessPlayback: false,
-///  customSize: MediaQuery.of(context).size,
-///  heroAttributes: const HeroAttributes(
-///   tag: "someTag",
-///   transitionOnUserGestures: true,
-///  ),
-///  scaleStateChangedCallback: this.onScaleStateChanged,
-///  enableRotation: true,
-///  controller:  controller,
-///  minScale: PhotoViewComputedScale.contained * 0.8,
-///  maxScale: PhotoViewComputedScale.covered * 1.8,
-///  initialScale: PhotoViewComputedScale.contained,
-///  basePosition: Alignment.center,
-///  scaleStateCycle: scaleStateCycle
-/// );
-/// ```
-/// The [maxScale], [minScale] and [initialScale] options may be [double] or a [PhotoViewComputedScale] constant
-///
-/// Sample using [maxScale], [minScale] and [initialScale]
-///
-/// ```
-/// PhotoView(
-///  imageProvider: imageProvider,
-///  minScale: PhotoViewComputedScale.contained * 0.8,
-///  maxScale: PhotoViewComputedScale.covered * 1.8,
-///  initialScale: PhotoViewComputedScale.contained * 1.1,
-/// );
-/// ```
-///
-/// [customSize] is used to define the viewPort size in which the image will be
-/// scaled to. This argument is rarely used. By default is the size that this widget assumes.
-///
-/// The argument [gaplessPlayback] is used to continue showing the old image
-/// (`true`), or briefly show nothing (`false`), when the [imageProvider]
-/// changes.By default it's set to `false`.
-///
-/// To use within an hero animation, specify [heroAttributes]. When
-/// [heroAttributes] is specified, the image provider retrieval process should
-/// be sync.
-///
-/// Sample using hero animation:
-/// ```
-/// // screen1
-///   ...
-///   Hero(
-///     tag: "someTag",
-///     child: Image.asset(
-///       "assets/large-image.jpg",
-///       width: 150.0
-///     ),
-///   )
-/// // screen2
-/// ...
-/// child: PhotoView(
-///   imageProvider: AssetImage("assets/large-image.jpg"),
-///   heroAttributes: const HeroAttributes(tag: "someTag"),
-/// )
-/// ```
-///
-/// **Note: If you don't want to the zoomed image do not overlaps the size of the container, use [ClipRect](https://docs.flutter.io/flutter/widgets/ClipRect-class.html)**
-///
-/// ## Controllers
-///
-/// Controllers, when specified to PhotoView widget, enables the author(you) to listen for state updates through a `Stream` and change those values externally.
-///
-/// While [PhotoViewScaleStateController] is only responsible for the `scaleState`, [PhotoViewController] is responsible for all fields os [PhotoViewControllerValue].
-///
-/// To use them, pass a instance of those items on [controller] or [scaleStateController];
-///
-/// Since those follows the standard controller pattern found in widgets like [PageView] and [ScrollView], whoever instantiates it, should [dispose] it afterwards.
-///
-/// Example of [controller] usage, only listening for state changes:
-///
-/// ```
-/// class _ExampleWidgetState extends State<ExampleWidget> {
-///
-///   PhotoViewController controller;
-///   double scaleCopy;
-///
-///   @override
-///   void initState() {
-///     super.initState();
-///     controller = PhotoViewController()
-///       ..outputStateStream.listen(listener);
-///   }
-///
-///   @override
-///   void dispose() {
-///     controller.dispose();
-///     super.dispose();
-///   }
-///
-///   void listener(PhotoViewControllerValue value){
-///     setState((){
-///       scaleCopy = value.scale;
-///     })
-///   }
-///
-///   @override
-///   Widget build(BuildContext context) {
-///     return Stack(
-///       children: <Widget>[
-///         Positioned.fill(
-///             child: PhotoView(
-///               imageProvider: AssetImage("assets/pudim.png"),
-///               controller: controller,
-///             );
-///         ),
-///         Text("Scale applied: $scaleCopy")
-///       ],
-///     );
-///   }
-/// }
-/// ```
-///
-/// An example of [scaleStateController] with state changes:
-/// ```
-/// class _ExampleWidgetState extends State<ExampleWidget> {
-///
-///   PhotoViewScaleStateController scaleStateController;
-///
-///   @override
-///   void initState() {
-///     super.initState();
-///     scaleStateController = PhotoViewScaleStateController();
-///   }
-///
-///   @override
-///   void dispose() {
-///     scaleStateController.dispose();
-///     super.dispose();
-///   }
-///
-///   void goBack(){
-///     scaleStateController.scaleState = PhotoViewScaleState.originalSize;
-///   }
-///
-///   @override
-///   Widget build(BuildContext context) {
-///     return Stack(
-///       children: <Widget>[
-///         Positioned.fill(
-///             child: PhotoView(
-///               imageProvider: AssetImage("assets/pudim.png"),
-///               scaleStateController: scaleStateController,
-///             );
-///         ),
-///         FlatButton(
-///           child: Text("Go to original size"),
-///           onPressed: goBack,
-///         );
-///       ],
-///     );
-///   }
-/// }
-/// ```
-///
 class PhotoView extends StatefulWidget {
-  /// Creates a widget that displays a zoomable image.
-  ///
-  /// To show an image from the network or from an asset bundle, use their respective
-  /// image providers, ie: [AssetImage] or [NetworkImage]
-  ///
-  /// Internally, the image is rendered within an [Image] widget.
   const PhotoView({
     super.key,
     required this.imageProvider,
@@ -264,12 +51,6 @@ class PhotoView extends StatefulWidget {
   })  : child = null,
         childSize = null;
 
-  /// Creates a widget that displays a zoomable child.
-  ///
-  /// It has been created to resemble [PhotoView] behavior within widgets that aren't an image, such as [Container], [Text] or a svg.
-  ///
-  /// Instead of a [imageProvider], this constructor will receive a [child] and a [childSize].
-  ///
   const PhotoView.customChild({
     super.key,
     required this.child,
@@ -414,81 +195,71 @@ class PhotoView extends StatefulWidget {
   /// Enable strictScale will restrict user scale gesture to the maxScale and minScale values.
   final bool? strictScale;
 
-  bool get _isCustomChild {
-    return child != null;
-  }
-
   @override
-  State<StatefulWidget> createState() {
-    return _PhotoViewState();
-  }
+  State<StatefulWidget> createState() => _PhotoViewState();
 }
 
 class _PhotoViewState extends State<PhotoView>
     with AutomaticKeepAliveClientMixin {
-  // image retrieval
-
-  // controller
-  late bool _controlledController;
   late PhotoViewControllerBase _controller;
-  late bool _controlledScaleStateController;
   late PhotoViewScaleStateController _scaleStateController;
+  late StreamSubscription<PhotoViewScaleState> _scaleStateSubscription;
+
+  @override
+  bool get wantKeepAlive => widget.wantKeepAlive;
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.controller == null) {
-      _controlledController = true;
-      _controller = PhotoViewController();
-    } else {
-      _controlledController = false;
-      _controller = widget.controller!;
-    }
+    _controller = widget.controller ?? PhotoViewController();
+    _scaleStateController =
+        widget.scaleStateController ?? PhotoViewScaleStateController();
 
-    if (widget.scaleStateController == null) {
-      _controlledScaleStateController = true;
-      _scaleStateController = PhotoViewScaleStateController();
-    } else {
-      _controlledScaleStateController = false;
-      _scaleStateController = widget.scaleStateController!;
-    }
-
-    _scaleStateController.outputScaleStateStream.listen(scaleStateListener);
+    _scaleStateSubscription =
+        _scaleStateController.outputScaleStateStream.listen(
+      scaleStateListener,
+    );
   }
 
   @override
   void didUpdateWidget(PhotoView oldWidget) {
-    if (widget.controller == null) {
-      if (!_controlledController) {
-        _controlledController = true;
-        _controller = PhotoViewController();
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller != oldWidget.controller) {
+      if (oldWidget.controller == null) {
+        _controller.dispose();
       }
-    } else {
-      _controlledController = false;
-      _controller = widget.controller!;
+
+      _controller = widget.controller ?? PhotoViewController();
     }
 
-    if (widget.scaleStateController == null) {
-      if (!_controlledScaleStateController) {
-        _controlledScaleStateController = true;
-        _scaleStateController = PhotoViewScaleStateController();
+    if (widget.scaleStateController != oldWidget.scaleStateController) {
+      _scaleStateSubscription.cancel().ignore();
+
+      if (oldWidget.scaleStateController == null) {
+        _scaleStateController.dispose();
       }
-    } else {
-      _controlledScaleStateController = false;
-      _scaleStateController = widget.scaleStateController!;
+
+      _scaleStateController =
+          widget.scaleStateController ?? PhotoViewScaleStateController();
+
+      _scaleStateSubscription =
+          _scaleStateController.outputScaleStateStream.listen(
+        scaleStateListener,
+      );
     }
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
-    if (_controlledController) {
+    if (widget.controller == null) {
       _controller.dispose();
     }
-    if (_controlledScaleStateController) {
+    if (widget.scaleStateController == null) {
       _scaleStateController.dispose();
     }
+
     super.dispose();
   }
 
@@ -508,7 +279,7 @@ class _PhotoViewState extends State<PhotoView>
         final backgroundDecoration = widget.backgroundDecoration ??
             const BoxDecoration(color: Colors.black);
 
-        return widget._isCustomChild
+        return widget.child != null
             ? CustomChildWrapper(
                 childSize: widget.childSize,
                 backgroundDecoration: backgroundDecoration,
@@ -567,9 +338,6 @@ class _PhotoViewState extends State<PhotoView>
       },
     );
   }
-
-  @override
-  bool get wantKeepAlive => widget.wantKeepAlive;
 }
 
 /// The default [ScaleStateCycle]
