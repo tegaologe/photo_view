@@ -7,12 +7,9 @@ import 'package:photo_view/photo_view.dart'
         PhotoViewHeroAttributes,
         PhotoViewImageScaleEndCallback,
         PhotoViewImageTapDownCallback,
-        PhotoViewImageTapUpCallback,
-        PhotoViewScaleState,
-        ScaleStateCycle;
+        PhotoViewImageTapUpCallback;
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
-import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
@@ -38,13 +35,10 @@ class PhotoViewCore extends StatefulWidget {
     required this.gestureDetectorBehavior,
     required this.controller,
     required this.scaleBoundaries,
-    required this.scaleStateCycle,
-    required this.scaleStateController,
     required this.basePosition,
     required this.tightMode,
     required this.filterQuality,
     required this.disableGestures,
-    required this.disableDoubleTap,
     required this.enablePanAlways,
     required this.strictScale,
   }) : customChild = null;
@@ -61,13 +55,10 @@ class PhotoViewCore extends StatefulWidget {
     this.gestureDetectorBehavior,
     required this.controller,
     required this.scaleBoundaries,
-    required this.scaleStateCycle,
-    required this.scaleStateController,
     required this.basePosition,
     required this.tightMode,
     required this.filterQuality,
     required this.disableGestures,
-    required this.disableDoubleTap,
     required this.enablePanAlways,
     required this.strictScale,
   })  : imageProvider = null,
@@ -83,9 +74,7 @@ class PhotoViewCore extends StatefulWidget {
   final Widget? customChild;
 
   final PhotoViewControllerBase controller;
-  final PhotoViewScaleStateController scaleStateController;
   final ScaleBoundaries scaleBoundaries;
-  final ScaleStateCycle scaleStateCycle;
   final Alignment basePosition;
 
   final PhotoViewImageTapUpCallback? onTapUp;
@@ -95,7 +84,6 @@ class PhotoViewCore extends StatefulWidget {
   final HitTestBehavior? gestureDetectorBehavior;
   final bool tightMode;
   final bool disableGestures;
-  final bool disableDoubleTap;
   final bool enablePanAlways;
   final bool strictScale;
 
@@ -163,8 +151,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       return;
     }
 
-    updateScaleStateFromNewScale(newScale);
-
     updateMultiple(
       scale: newScale,
       position: widget.enablePanAlways
@@ -222,10 +208,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     }
   }
 
-  void onDoubleTap() {
-    nextScaleState();
-  }
-
   void animateScale(double from, double to) {
     _scaleAnimation = Tween<double>(
       begin: from,
@@ -252,44 +234,22 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       ..fling(velocity: 0.4);
   }
 
-  void onAnimationStatus(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      onAnimationStatusCompleted();
-    }
-  }
-
-  /// Check if scale is equal to initial after scale animation update
-  void onAnimationStatusCompleted() {
-    if (scaleStateController.scaleState != PhotoViewScaleState.initial &&
-        scale == scaleBoundaries.initialScale) {
-      scaleStateController.setInvisibly(PhotoViewScaleState.initial);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     initDelegate();
-    addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
 
     cachedScaleBoundaries = widget.scaleBoundaries;
 
     _scaleAnimationController = AnimationController(vsync: this)
-      ..addListener(handleScaleAnimation)
-      ..addStatusListener(onAnimationStatus);
+      ..addListener(handleScaleAnimation);
+
     _positionAnimationController = AnimationController(vsync: this)
       ..addListener(handlePositionAnimate);
   }
 
-  void animateOnScaleStateUpdate(double prevScale, double nextScale) {
-    animateScale(prevScale, nextScale);
-    animatePosition(controller.position, Offset.zero);
-    animateRotation(controller.rotation, 0.0);
-  }
-
   @override
   void dispose() {
-    _scaleAnimationController.removeStatusListener(onAnimationStatus);
     _scaleAnimationController.dispose();
     _positionAnimationController.dispose();
     _rotationAnimationController.dispose();
@@ -394,7 +354,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           return Listener(
             onPointerSignal: _onPointerSignal,
             child: PhotoViewGestureDetector(
-              onDoubleTap: widget.disableDoubleTap ? null : nextScaleState,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,
               onScaleEnd: onScaleEnd,

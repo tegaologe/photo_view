@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view_example/screens/common/app_bar.dart';
 import 'package:photo_view_example/screens/examples/common_use_cases_examples.dart';
-import 'package:photo_view_example/screens/examples/controller_example.dart';
 import 'package:photo_view_example/screens/examples/custom_child_examples.dart';
 import 'package:photo_view_example/screens/examples/dialog_example.dart';
 import 'package:photo_view_example/screens/examples/gallery/gallery_example.dart';
@@ -78,18 +77,6 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                   text: "Network images",
-                ),
-                _buildItem(
-                  context,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ControllerExample(),
-                      ),
-                    );
-                  },
-                  text: "Controller",
                 ),
                 _buildItem(
                   context,

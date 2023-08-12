@@ -2,33 +2,6 @@ import 'dart:math' as math;
 import 'dart:ui' show Size;
 
 import "package:photo_view/src/photo_view_computed_scale.dart";
-import 'package:photo_view/src/photo_view_scale_state.dart';
-
-/// Given a [PhotoViewScaleState], returns a scale value considering [scaleBoundaries].
-double getScaleForScaleState(
-  PhotoViewScaleState scaleState,
-  ScaleBoundaries scaleBoundaries,
-) {
-  switch (scaleState) {
-    case PhotoViewScaleState.initial:
-    case PhotoViewScaleState.zoomedIn:
-    case PhotoViewScaleState.zoomedOut:
-      return _clampSize(scaleBoundaries.initialScale, scaleBoundaries);
-    case PhotoViewScaleState.covering:
-      return _clampSize(
-        _scaleForCovering(
-          scaleBoundaries.outerSize,
-          scaleBoundaries.childSize,
-        ),
-        scaleBoundaries,
-      );
-    case PhotoViewScaleState.originalSize:
-      return _clampSize(1.0, scaleBoundaries);
-    // Will never be reached
-    default:
-      return 0;
-  }
-}
 
 /// Internal class to wraps custom scale boundaries (min, max and initial)
 /// Also, stores values regarding the two sizes: the container and teh child.
@@ -131,10 +104,6 @@ double _scaleForCovering(Size size, Size childSize) {
   final screenHeight = size.height;
 
   return math.max(screenWidth / imageWidth, screenHeight / imageHeight);
-}
-
-double _clampSize(double size, ScaleBoundaries scaleBoundaries) {
-  return size.clamp(scaleBoundaries.minScale, scaleBoundaries.maxScale);
 }
 
 /// Simple class to store a min and a max value
