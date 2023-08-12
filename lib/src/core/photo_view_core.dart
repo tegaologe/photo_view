@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart'
     show
@@ -301,6 +304,40 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     widget.onTapDown?.call(context, details, controller.value);
   }
 
+  void _onPointerSignal(PointerSignalEvent event) {
+    double scaleChange;
+
+    if (event is PointerScrollEvent) {
+      if (event.scrollDelta.dy == 0.0) return;
+
+      scaleChange = exp(-event.scrollDelta.dy / 200);
+    } else if (event is PointerScaleEvent) {
+      scaleChange = event.scale;
+    } else {
+      return;
+    }
+
+    onScaleStart(ScaleStartDetails(focalPoint: event.position));
+
+    final newScale = _scaleBefore * scaleChange;
+
+    if (newScale > widget.scaleBoundaries.maxScale) {
+      scaleChange = widget.scaleBoundaries.maxScale / _scaleBefore;
+    } else if (newScale < widget.scaleBoundaries.minScale) {
+      scaleChange = widget.scaleBoundaries.minScale / _scaleBefore;
+    }
+
+    onScaleUpdate(
+      ScaleUpdateDetails(
+        focalPoint: event.position,
+        localFocalPoint: event.localPosition,
+        scale: scaleChange,
+      ),
+    );
+
+    onScaleEnd(ScaleEndDetails());
+  }
+
   @override
   Widget build(BuildContext context) {
     // Check if we need a recalc on the scale
@@ -354,19 +391,22 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             return child;
           }
 
-          return PhotoViewGestureDetector(
-            onDoubleTap: widget.disableDoubleTap ? null : nextScaleState,
-            onScaleStart: onScaleStart,
-            onScaleUpdate: onScaleUpdate,
-            onScaleEnd: onScaleEnd,
-            hitDetector: this,
-            onTapUp: widget.onTapUp != null
-                ? (details) => widget.onTapUp!(context, details, value)
-                : null,
-            onTapDown: widget.onTapDown != null
-                ? (details) => widget.onTapDown!(context, details, value)
-                : null,
-            child: child,
+          return Listener(
+            onPointerSignal: _onPointerSignal,
+            child: PhotoViewGestureDetector(
+              onDoubleTap: widget.disableDoubleTap ? null : nextScaleState,
+              onScaleStart: onScaleStart,
+              onScaleUpdate: onScaleUpdate,
+              onScaleEnd: onScaleEnd,
+              hitDetector: this,
+              onTapUp: widget.onTapUp != null
+                  ? (details) => widget.onTapUp!(context, details, value)
+                  : null,
+              onTapDown: widget.onTapDown != null
+                  ? (details) => widget.onTapDown!(context, details, value)
+                  : null,
+              child: child,
+            ),
           );
         } else {
           return Container();
