@@ -63,7 +63,7 @@ class PhotoViewCore extends StatefulWidget {
   final PhotoViewHeroAttributes? heroAttributes;
   final bool enableRotation;
   final Widget? customChild;
-  final PhotoViewControllerBase controller;
+  final PhotoViewController controller;
   final ScaleBoundaries scaleBoundaries;
   final Alignment basePosition;
   final GestureTapUpCallback? onTapUp;

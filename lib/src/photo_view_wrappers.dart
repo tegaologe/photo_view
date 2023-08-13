@@ -43,7 +43,7 @@ class ImageWrapper extends StatefulWidget {
   final dynamic maxScale;
   final dynamic minScale;
   final dynamic initialScale;
-  final PhotoViewControllerBase controller;
+  final PhotoViewController controller;
   final Alignment? basePosition;
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
@@ -245,7 +245,7 @@ class CustomChildWrapper extends StatelessWidget {
   final Decoration backgroundDecoration;
   final PhotoViewHeroAttributes? heroAttributes;
   final bool enableRotation;
-  final PhotoViewControllerBase controller;
+  final PhotoViewController controller;
   final dynamic maxScale;
   final dynamic minScale;
   final dynamic initialScale;

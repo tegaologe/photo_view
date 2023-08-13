@@ -137,7 +137,7 @@ class PhotoView extends StatefulWidget {
   final dynamic initialScale;
 
   /// A way to control PhotoView transformation factors externally and listen to its updates
-  final PhotoViewControllerBase? controller;
+  final PhotoViewController? controller;
 
   /// The alignment of the scale origin in relation to the widget size. Default is [Alignment.center]
   final Alignment? basePosition;
@@ -181,7 +181,7 @@ class PhotoView extends StatefulWidget {
 
 class _PhotoViewState extends State<PhotoView>
     with AutomaticKeepAliveClientMixin {
-  late PhotoViewControllerBase _controller;
+  late PhotoViewController _controller;
 
   @override
   bool get wantKeepAlive => widget.wantKeepAlive;

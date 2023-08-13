@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:photo_view/photo_view.dart' show PhotoViewControllerBase;
+import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
 
@@ -7,7 +7,7 @@ import 'package:photo_view/src/utils/photo_view_utils.dart';
 ///
 /// It reacts to layout changes (eg: enter landscape or widget resize) and syncs the two controllers.
 mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
-  PhotoViewControllerBase get controller => widget.controller;
+  PhotoViewController get controller => widget.controller;
   ScaleBoundaries get scaleBoundaries => widget.scaleBoundaries;
   Alignment get basePosition => widget.basePosition;
 
