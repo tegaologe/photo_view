@@ -2,7 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:photo_view/photo_view.dart' show PhotoViewHeroAttributes;
+import 'package:photo_view/photo_view.dart'
+    show PhotoViewDecoration, PhotoViewHeroAttributes;
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
@@ -14,67 +15,16 @@ import 'package:photo_view/src/utils/photo_view_utils.dart';
 class PhotoViewCore extends StatefulWidget {
   const PhotoViewCore({
     super.key,
-    required ImageProvider this.imageProvider,
-    required this.backgroundDecoration,
-    required this.semanticLabel,
-    required this.gaplessPlayback,
-    required this.heroAttributes,
-    required this.enableRotation,
-    required this.onTapUp,
-    required this.onTapDown,
-    required this.onScaleEnd,
-    required this.gestureDetectorBehavior,
+    required this.child,
+    required this.decoration,
     required this.controller,
     required this.scaleBoundaries,
-    required this.basePosition,
-    required this.tightMode,
-    required this.filterQuality,
-    required this.disableGestures,
-    required this.enablePanAlways,
-    required this.strictScale,
-  }) : customChild = null;
+  });
 
-  const PhotoViewCore.customChild({
-    super.key,
-    required Widget this.customChild,
-    required this.backgroundDecoration,
-    required this.heroAttributes,
-    required this.enableRotation,
-    required this.onTapUp,
-    required this.onTapDown,
-    required this.onScaleEnd,
-    required this.gestureDetectorBehavior,
-    required this.controller,
-    required this.scaleBoundaries,
-    required this.basePosition,
-    required this.tightMode,
-    required this.filterQuality,
-    required this.disableGestures,
-    required this.enablePanAlways,
-    required this.strictScale,
-  })  : imageProvider = null,
-        semanticLabel = null,
-        gaplessPlayback = false;
-
-  final Decoration backgroundDecoration;
-  final ImageProvider? imageProvider;
-  final String? semanticLabel;
-  final bool? gaplessPlayback;
-  final PhotoViewHeroAttributes? heroAttributes;
-  final bool enableRotation;
-  final Widget? customChild;
+  final PhotoViewDecoration decoration;
+  final Widget child;
   final PhotoViewController controller;
   final ScaleBoundaries scaleBoundaries;
-  final Alignment basePosition;
-  final GestureTapUpCallback? onTapUp;
-  final GestureTapDownCallback? onTapDown;
-  final GestureScaleEndCallback? onScaleEnd;
-  final HitTestBehavior? gestureDetectorBehavior;
-  final bool tightMode;
-  final bool disableGestures;
-  final bool enablePanAlways;
-  final bool strictScale;
-  final FilterQuality filterQuality;
 
   @override
   State<StatefulWidget> createState() => PhotoViewCoreState();
@@ -98,7 +48,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   late final AnimationController _rotationAnimationController;
   late Animation<double> _rotationAnimation;
 
-  PhotoViewHeroAttributes? get heroAttributes => widget.heroAttributes;
+  PhotoViewHeroAttributes? get heroAttributes =>
+      widget.decoration.heroAttributes;
 
   late ScaleBoundaries cachedScaleBoundaries = widget.scaleBoundaries;
 
@@ -152,7 +103,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     final newScale = _scaleBefore * details.scale;
     final delta = details.focalPoint - _normalizedPosition;
 
-    if (widget.strictScale &&
+    if (widget.decoration.strictScale &&
         (newScale > widget.scaleBoundaries.maxScale ||
             newScale < widget.scaleBoundaries.minScale)) {
       return;
@@ -160,17 +111,19 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
     controller.updateMultiple(
       scale: newScale,
-      position: widget.enablePanAlways
+      position: widget.decoration.enablePanAlways
           ? delta
           : clampPosition(position: delta * details.scale),
-      rotation:
-          widget.enableRotation ? _rotationBefore + details.rotation : null,
-      rotationFocusPoint: widget.enableRotation ? details.focalPoint : null,
+      rotation: widget.decoration.enableRotation
+          ? _rotationBefore + details.rotation
+          : null,
+      rotationFocusPoint:
+          widget.decoration.enableRotation ? details.focalPoint : null,
     );
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
-    widget.onScaleEnd?.call(details);
+    widget.decoration.onScaleEnd?.call(details);
 
     final scale = this.scale;
     final position = controller.position;
@@ -268,16 +221,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   Widget _buildChild() {
-    final child = widget.customChild ??
-        Image(
-          image: widget.imageProvider!,
-          semanticLabel: widget.semanticLabel,
-          gaplessPlayback: widget.gaplessPlayback ?? false,
-          filterQuality: widget.filterQuality,
-          width: scaleBoundaries.childSize.width * scale,
-          fit: BoxFit.contain,
-        );
-
     if (heroAttributes != null) {
       return Hero(
         tag: heroAttributes!.tag,
@@ -285,11 +228,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         flightShuttleBuilder: heroAttributes!.flightShuttleBuilder,
         placeholderBuilder: heroAttributes!.placeholderBuilder,
         transitionOnUserGestures: heroAttributes!.transitionOnUserGestures,
-        child: child,
+        child: widget.child,
       );
     }
 
-    return child;
+    return widget.child;
   }
 
   @override
@@ -312,7 +255,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         }
 
         final value = snapshot.data!;
-        final useImageScale = widget.filterQuality != FilterQuality.none;
+        final useImageScale =
+            widget.decoration.filterQuality != FilterQuality.none;
 
         final computedScale = useImageScale ? 1.0 : scale;
 
@@ -331,10 +275,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         );
 
         final child = Container(
-          constraints: widget.tightMode
+          constraints: widget.decoration.tightMode
               ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
               : null,
-          decoration: widget.backgroundDecoration,
+          decoration: widget.decoration.backgroundDecoration,
           child: Center(
             child: Transform(
               transform: matrix,
@@ -344,7 +288,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           ),
         );
 
-        if (widget.disableGestures) {
+        if (widget.decoration.disableGestures) {
           return child;
         }
 
@@ -355,8 +299,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             onScaleUpdate: _onScaleUpdate,
             onScaleEnd: _onScaleEnd,
             hitDetector: this,
-            onTapUp: widget.onTapUp,
-            onTapDown: widget.onTapDown,
+            onTapUp: widget.decoration.onTapUp,
+            onTapDown: widget.decoration.onTapDown,
             child: child,
           ),
         );

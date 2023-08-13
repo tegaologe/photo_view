@@ -93,7 +93,7 @@ class GalleryPhotoViewWrapper extends StatefulWidget {
     this.scrollDirection = Axis.horizontal,
   }) : pageController = PageController(initialPage: initialIndex);
 
-  final LoadingBuilder? loadingBuilder;
+  final PhotoViewImageLoadingBuilder? loadingBuilder;
   final BoxDecoration backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
@@ -155,13 +155,15 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
   Widget _buildItem(BuildContext context, int index) {
     final item = widget.galleryItems[index];
     return item.isSvg
-        ? PhotoView.customChild(
+        ? PhotoView.custom(
             childSize: const Size(300, 300),
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
-            heroAttributes: PhotoViewHeroAttributes(tag: item.id),
-            backgroundDecoration: widget.backgroundDecoration,
+            decoration: PhotoViewDecoration(
+              heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+              backgroundDecoration: widget.backgroundDecoration,
+            ),
             child: SizedBox(
               width: 300,
               height: 300,
@@ -173,9 +175,12 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
-            heroAttributes: PhotoViewHeroAttributes(tag: item.id),
-            loadingBuilder: widget.loadingBuilder,
-            backgroundDecoration: widget.backgroundDecoration,
+            loadingBuilder:
+                widget.loadingBuilder ?? (_, __) => const SizedBox(),
+            decoration: PhotoViewDecoration(
+              heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+              backgroundDecoration: widget.backgroundDecoration,
+            ),
           );
   }
 }

@@ -30,7 +30,7 @@ class GestureRotationExample extends StatelessWidget {
                   imageProvider: const AssetImage("assets/large-image.jpg"),
                   maxScale: PhotoViewComputedScale.covered,
                   initialScale: PhotoViewComputedScale.contained * 0.8,
-                  enableRotation: true,
+                  decoration: const PhotoViewDecoration(enableRotation: true),
                 ),
               ),
             ),

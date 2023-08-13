@@ -61,10 +61,12 @@ class HeroPhotoViewRouteWrapper extends StatelessWidget {
       ),
       child: PhotoView(
         imageProvider: imageProvider,
-        backgroundDecoration: backgroundDecoration,
         minScale: minScale,
         maxScale: maxScale,
-        heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+        decoration: PhotoViewDecoration(
+          backgroundDecoration: backgroundDecoration,
+          heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+        ),
       ),
     );
   }

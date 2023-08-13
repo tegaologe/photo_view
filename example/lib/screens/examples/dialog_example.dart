@@ -14,9 +14,11 @@ class _DialogExampleState extends State<DialogExample> {
         context: context,
         builder: (BuildContext context) => const Dialog(
           child: PhotoView(
-            tightMode: true,
             imageProvider: AssetImage("assets/large-image.jpg"),
-            heroAttributes: PhotoViewHeroAttributes(tag: "someTag"),
+            decoration: PhotoViewDecoration(
+              tightMode: true,
+              heroAttributes: PhotoViewHeroAttributes(tag: "someTag"),
+            ),
           ),
         ),
       );
@@ -29,11 +31,13 @@ class _DialogExampleState extends State<DialogExample> {
           return PhotoViewGestureDetectorScope(
             axis: Axis.vertical,
             child: PhotoView(
-              backgroundDecoration: BoxDecoration(
-                color: Colors.black.withAlpha(240),
+              decoration: PhotoViewDecoration(
+                backgroundDecoration: BoxDecoration(
+                  color: Colors.black.withAlpha(240),
+                ),
+                heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
               ),
               imageProvider: const AssetImage("assets/large-image.jpg"),
-              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
             ),
           );
         },
@@ -49,9 +53,11 @@ class _DialogExampleState extends State<DialogExample> {
               child: PhotoViewGestureDetectorScope(
                 axis: Axis.vertical,
                 child: PhotoView(
-                  tightMode: true,
                   imageProvider: AssetImage("assets/large-image.jpg"),
-                  heroAttributes: PhotoViewHeroAttributes(tag: "someTag"),
+                  decoration: PhotoViewDecoration(
+                    tightMode: true,
+                    heroAttributes: PhotoViewHeroAttributes(tag: "someTag"),
+                  ),
                 ),
               ),
             ),

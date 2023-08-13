@@ -9,7 +9,7 @@ import 'package:photo_view/src/utils/photo_view_utils.dart';
 mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   PhotoViewController get controller => widget.controller;
   ScaleBoundaries get scaleBoundaries => widget.scaleBoundaries;
-  Alignment get basePosition => widget.basePosition;
+  Alignment get basePosition => widget.decoration.basePosition;
 
   /// Mark if scale need recalculation, useful for scale boundaries changes.
   bool markNeedsScaleRecalc = true;
@@ -19,7 +19,7 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void _blindScaleListener() {
-    if (!widget.enablePanAlways) {
+    if (!widget.decoration.enablePanAlways) {
       controller.position = clampPosition();
     }
     if (controller.scale == controller.prevValue.scale) {

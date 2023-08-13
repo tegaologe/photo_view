@@ -4,7 +4,7 @@ import 'package:photo_view/photo_view.dart';
 class CommonExampleRouteWrapper extends StatelessWidget {
   const CommonExampleRouteWrapper({
     super.key,
-    this.imageProvider,
+    required this.imageProvider,
     this.loadingBuilder,
     this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.minScale,
@@ -16,8 +16,8 @@ class CommonExampleRouteWrapper extends StatelessWidget {
     this.errorBuilder,
   });
 
-  final ImageProvider? imageProvider;
-  final LoadingBuilder? loadingBuilder;
+  final ImageProvider imageProvider;
+  final PhotoViewImageLoadingBuilder? loadingBuilder;
   final BoxDecoration backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
@@ -36,15 +36,17 @@ class CommonExampleRouteWrapper extends StatelessWidget {
         ),
         child: PhotoView(
           imageProvider: imageProvider,
-          loadingBuilder: loadingBuilder,
-          backgroundDecoration: backgroundDecoration,
+          loadingBuilder: loadingBuilder ?? (_, __) => const SizedBox(),
+          decoration: PhotoViewDecoration(
+            backgroundDecoration: backgroundDecoration,
+            basePosition: basePosition,
+            filterQuality: filterQuality,
+            disableGestures: disableGestures,
+          ),
           minScale: minScale,
           maxScale: maxScale,
           initialScale: initialScale,
-          basePosition: basePosition,
-          filterQuality: filterQuality,
-          disableGestures: disableGestures,
-          errorBuilder: errorBuilder,
+          errorBuilder: (_, __, ___) => const SizedBox(),
         ),
       ),
     );
