@@ -30,8 +30,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scope = PhotoViewGestureDetectorScope.of(context);
-    final axis = scope?.axis;
+    final axis = PhotoViewGestureDetectorScope.maybeOf(context);
 
     return RawGestureDetector(
       behavior: behavior,
@@ -44,11 +43,10 @@ class PhotoViewGestureDetector extends StatelessWidget {
               ..onTapDown = onTapDown
               ..onTapUp = onTapUp,
           ),
-        PhotoViewGestureRecognizer:
-            GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
-          () => PhotoViewGestureRecognizer(
+        _PhotoViewGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<_PhotoViewGestureRecognizer>(
+          () => _PhotoViewGestureRecognizer(
             hitDetector: hitDetector,
-            debugOwner: this,
             validateAxis: axis,
           ),
           (instance) => instance
@@ -63,17 +61,16 @@ class PhotoViewGestureDetector extends StatelessWidget {
   }
 }
 
-class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
-  PhotoViewGestureRecognizer({
+class _PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
+  _PhotoViewGestureRecognizer({
     this.hitDetector,
-    super.debugOwner,
     this.validateAxis,
   });
 
   final HitCornersDetector? hitDetector;
   final Axis? validateAxis;
 
-  Map<int, Offset> _pointerLocations = <int, Offset>{};
+  final _pointerLocations = <int, Offset>{};
 
   Offset? _initialFocalPoint;
   Offset? _currentFocalPoint;
@@ -82,17 +79,19 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
 
   @override
   void addAllowedPointer(PointerDownEvent event) {
+    super.addAllowedPointer(event);
+
     if (ready) {
       ready = false;
-      _pointerLocations = <int, Offset>{};
+      _pointerLocations.clear();
     }
-    super.addAllowedPointer(event);
   }
 
   @override
   void didStopTrackingLastPointer(int pointer) {
-    ready = true;
     super.didStopTrackingLastPointer(pointer);
+
+    ready = true;
   }
 
   @override
@@ -102,6 +101,7 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
       _updateDistances();
       _decideIfWeAcceptEvent(event);
     }
+
     super.handleEvent(event);
   }
 
@@ -122,9 +122,11 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
   void _updateDistances() {
     final count = _pointerLocations.keys.length;
     var focalPoint = Offset.zero;
+
     for (final pointer in _pointerLocations.keys) {
       focalPoint += _pointerLocations[pointer]!;
     }
+
     _currentFocalPoint =
         count > 0 ? focalPoint / count.toDouble() : Offset.zero;
   }
@@ -133,31 +135,24 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     if (event is! PointerMoveEvent) {
       return;
     }
+
     final move = _initialFocalPoint! - _currentFocalPoint!;
     final shouldMove = hitDetector!.shouldMove(move, validateAxis!);
+
     if (shouldMove || _pointerLocations.keys.length > 1) {
       acceptGesture(event.pointer);
     }
   }
 }
 
-/// An [InheritedWidget] responsible to give a axis aware scope to [PhotoViewGestureRecognizer].
+/// An [InheritedWidget] responsible to give a axis aware scope to
+/// [_PhotoViewGestureRecognizer].
 ///
-/// When using this, PhotoView will test if the content zoomed has hit edge every time user pinches,
-/// if so, it will let parent gesture detectors win the gesture arena
+/// When using this, PhotoView will test if the content zoomed has hit edge
+/// every time user pinches, if so, it will let parent gesture detectors win the gesture arena
 ///
 /// Useful when placing PhotoView inside a gesture sensitive context,
 /// such as [PageView], [Dismissible], [BottomSheet].
-///
-/// Usage example:
-/// ```
-/// PhotoViewGestureDetectorScope(
-///   axis: Axis.vertical,
-///   child: PhotoView(
-///     imageProvider: AssetImage("assets/pudim.jpg"),
-///   ),
-/// );
-/// ```
 class PhotoViewGestureDetectorScope extends InheritedWidget {
   const PhotoViewGestureDetectorScope({
     super.key,
@@ -165,13 +160,13 @@ class PhotoViewGestureDetectorScope extends InheritedWidget {
     required super.child,
   });
 
-  static PhotoViewGestureDetectorScope? of(BuildContext context) {
-    final scope = context
-        .dependOnInheritedWidgetOfExactType<PhotoViewGestureDetectorScope>();
-    return scope;
-  }
-
   final Axis? axis;
+
+  static Axis? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<PhotoViewGestureDetectorScope>()
+        ?.axis;
+  }
 
   @override
   bool updateShouldNotify(PhotoViewGestureDetectorScope oldWidget) {
