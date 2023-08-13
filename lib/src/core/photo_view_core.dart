@@ -51,14 +51,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   PhotoViewHeroAttributes? get heroAttributes =>
       widget.decoration.heroAttributes;
 
-  late ScaleBoundaries cachedScaleBoundaries = widget.scaleBoundaries;
-
   @override
   void initState() {
     super.initState();
     initDelegate();
-
-    cachedScaleBoundaries = widget.scaleBoundaries;
 
     _scaleAnimationController = AnimationController(vsync: this)
       ..addListener(_handleScaleAnimation);
@@ -68,6 +64,15 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
     _rotationAnimationController = AnimationController(vsync: this)
       ..addListener(_handleRotationAnimation);
+  }
+
+  @override
+  void didUpdateWidget(covariant PhotoViewCore oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.scaleBoundaries != widget.scaleBoundaries) {
+      markNeedsScaleRecalc = true;
+    }
   }
 
   @override
@@ -237,12 +242,6 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
   @override
   Widget build(BuildContext context) {
-    // Check if we need a recalc on the scale
-    if (widget.scaleBoundaries != cachedScaleBoundaries) {
-      markNeedsScaleRecalc = true;
-      cachedScaleBoundaries = widget.scaleBoundaries;
-    }
-
     return StreamBuilder(
       stream: controller.outputStateStream,
       initialData: controller.prevValue,
