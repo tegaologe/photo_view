@@ -11,12 +11,18 @@ export 'src/core/photo_view_gesture_detector.dart'
 export 'src/photo_view_computed_scale.dart';
 export 'src/utils/photo_view_hero_attributes.dart';
 
+/// A type definition for a callback to show a widget while the image is loading, a [ImageChunkEvent] is passed to inform progress
+typedef LoadingBuilder = Widget Function(
+  BuildContext context,
+  ImageChunkEvent? event,
+);
+
 class PhotoView extends StatefulWidget {
   const PhotoView({
     super.key,
     required this.imageProvider,
     this.loadingBuilder,
-    this.backgroundDecoration,
+    this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.wantKeepAlive = false,
     this.semanticLabel,
     this.gaplessPlayback = false,
@@ -32,12 +38,12 @@ class PhotoView extends StatefulWidget {
     this.onScaleEnd,
     this.customSize,
     this.gestureDetectorBehavior,
-    this.tightMode,
+    this.tightMode = false,
     this.filterQuality,
-    this.disableGestures,
+    this.disableGestures = false,
     this.errorBuilder,
-    this.enablePanAlways,
-    this.strictScale,
+    this.enablePanAlways = false,
+    this.strictScale = false,
   })  : child = null,
         childSize = null;
 
@@ -45,7 +51,7 @@ class PhotoView extends StatefulWidget {
     super.key,
     required this.child,
     this.childSize,
-    this.backgroundDecoration,
+    this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.wantKeepAlive = false,
     this.heroAttributes,
     this.enableRotation = false,
@@ -59,11 +65,11 @@ class PhotoView extends StatefulWidget {
     this.onScaleEnd,
     this.customSize,
     this.gestureDetectorBehavior,
-    this.tightMode,
+    this.tightMode = false,
     this.filterQuality,
-    this.disableGestures,
-    this.enablePanAlways,
-    this.strictScale,
+    this.disableGestures = false,
+    this.enablePanAlways = false,
+    this.strictScale = false,
   })  : errorBuilder = null,
         imageProvider = null,
         semanticLabel = null,
@@ -81,8 +87,8 @@ class PhotoView extends StatefulWidget {
   /// Show loadFailedChild when the image failed to load
   final ImageErrorWidgetBuilder? errorBuilder;
 
-  /// Changes the background behind image, defaults to `Colors.black`.
-  final BoxDecoration? backgroundDecoration;
+  /// Changes the background behind image.
+  final BoxDecoration backgroundDecoration;
 
   /// This is used to keep the state of an image in the gallery (e.g. scale state).
   /// `false` -> resets the state (default)
@@ -103,8 +109,7 @@ class PhotoView extends StatefulWidget {
   /// [Hero]. Leave this property undefined if you don't want a hero animation.
   final PhotoViewHeroAttributes? heroAttributes;
 
-  /// Defines the size of the scaling base of the image inside [PhotoView],
-  /// by default it is `MediaQuery.of(context).size`.
+  /// Defines the size of the scaling base of the image inside [PhotoView].
   final Size? customSize;
 
   /// A flag that enables the rotation gesture support
@@ -139,36 +144,36 @@ class PhotoView extends StatefulWidget {
 
   /// A pointer that will trigger a tap has stopped contacting the screen at a
   /// particular location.
-  final PhotoViewImageTapUpCallback? onTapUp;
+  final GestureTapUpCallback? onTapUp;
 
   /// A pointer that might cause a tap has contacted the screen at a particular
   /// location.
-  final PhotoViewImageTapDownCallback? onTapDown;
+  final GestureTapDownCallback? onTapDown;
 
   /// A pointer that will trigger a scale has stopped contacting the screen at a
   /// particular location.
-  final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final GestureScaleEndCallback? onScaleEnd;
 
   /// [HitTestBehavior] to be passed to the internal gesture detector.
   final HitTestBehavior? gestureDetectorBehavior;
 
   /// Enables tight mode, making background container assume the size of the image/child.
   /// Useful when inside a [Dialog]
-  final bool? tightMode;
+  final bool tightMode;
 
   /// Quality levels for image filters.
   final FilterQuality? filterQuality;
 
   // Removes gesture detector if `true`.
   // Useful when custom gesture detector is used in child widget.
-  final bool? disableGestures;
+  final bool disableGestures;
 
   /// Enable pan the widget even if it's smaller than the hole parent widget.
   /// Useful when you want to drag a widget without restrictions.
-  final bool? enablePanAlways;
+  final bool enablePanAlways;
 
   /// Enable strictScale will restrict user scale gesture to the maxScale and minScale values.
-  final bool? strictScale;
+  final bool strictScale;
 
   @override
   State<StatefulWidget> createState() => _PhotoViewState();
@@ -214,18 +219,13 @@ class _PhotoViewState extends State<PhotoView>
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutBuilder(
-      builder: (
-        BuildContext context,
-        BoxConstraints constraints,
-      ) {
+      builder: (context, constraints) {
         final computedOuterSize = widget.customSize ?? constraints.biggest;
-        final backgroundDecoration = widget.backgroundDecoration ??
-            const BoxDecoration(color: Colors.black);
 
         return widget.child != null
             ? CustomChildWrapper(
                 childSize: widget.childSize,
-                backgroundDecoration: backgroundDecoration,
+                backgroundDecoration: widget.backgroundDecoration,
                 heroAttributes: widget.heroAttributes,
                 enableRotation: widget.enableRotation,
                 controller: _controller,
@@ -243,12 +243,12 @@ class _PhotoViewState extends State<PhotoView>
                 disableGestures: widget.disableGestures,
                 enablePanAlways: widget.enablePanAlways,
                 strictScale: widget.strictScale,
-                child: widget.child,
+                child: widget.child!,
               )
             : ImageWrapper(
                 imageProvider: widget.imageProvider!,
                 loadingBuilder: widget.loadingBuilder,
-                backgroundDecoration: backgroundDecoration,
+                backgroundDecoration: widget.backgroundDecoration,
                 semanticLabel: widget.semanticLabel,
                 gaplessPlayback: widget.gaplessPlayback,
                 heroAttributes: widget.heroAttributes,
@@ -274,30 +274,3 @@ class _PhotoViewState extends State<PhotoView>
     );
   }
 }
-
-/// A type definition for a callback when the user taps up the photoview region
-typedef PhotoViewImageTapUpCallback = Function(
-  BuildContext context,
-  TapUpDetails details,
-  PhotoViewControllerValue controllerValue,
-);
-
-/// A type definition for a callback when the user taps down the photoview region
-typedef PhotoViewImageTapDownCallback = Function(
-  BuildContext context,
-  TapDownDetails details,
-  PhotoViewControllerValue controllerValue,
-);
-
-/// A type definition for a callback when a user finished scale
-typedef PhotoViewImageScaleEndCallback = Function(
-  BuildContext context,
-  ScaleEndDetails details,
-  PhotoViewControllerValue controllerValue,
-);
-
-/// A type definition for a callback to show a widget while the image is loading, a [ImageChunkEvent] is passed to inform progress
-typedef LoadingBuilder = Widget Function(
-  BuildContext context,
-  ImageChunkEvent? event,
-);

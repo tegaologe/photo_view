@@ -73,9 +73,6 @@ class _GalleryExampleState extends State<GalleryExample> {
       MaterialPageRoute(
         builder: (context) => GalleryPhotoViewWrapper(
           galleryItems: galleryItems,
-          backgroundDecoration: const BoxDecoration(
-            color: Colors.black,
-          ),
           initialIndex: index,
           scrollDirection: verticalGallery ? Axis.vertical : Axis.horizontal,
         ),
@@ -88,7 +85,7 @@ class GalleryPhotoViewWrapper extends StatefulWidget {
   GalleryPhotoViewWrapper({
     super.key,
     this.loadingBuilder,
-    this.backgroundDecoration,
+    this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.minScale,
     this.maxScale,
     this.initialIndex = 0,
@@ -97,7 +94,7 @@ class GalleryPhotoViewWrapper extends StatefulWidget {
   }) : pageController = PageController(initialPage: initialIndex);
 
   final LoadingBuilder? loadingBuilder;
-  final BoxDecoration? backgroundDecoration;
+  final BoxDecoration backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
   final int initialIndex;
@@ -130,13 +127,11 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
         ),
         child: Stack(
           alignment: Alignment.bottomRight,
-          children: <Widget>[
-            PhotoViewGallery.builder(
+          children: [
+            PhotoViewGallery(
               scrollPhysics: const BouncingScrollPhysics(),
               builder: _buildItem,
               itemCount: widget.galleryItems.length,
-              loadingBuilder: widget.loadingBuilder,
-              backgroundDecoration: widget.backgroundDecoration,
               pageController: widget.pageController,
               onPageChanged: onPageChanged,
               scrollDirection: widget.scrollDirection,
@@ -157,30 +152,30 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
     );
   }
 
-  PhotoViewGalleryPageOptions _buildItem(BuildContext context, int index) {
+  Widget _buildItem(BuildContext context, int index) {
     final item = widget.galleryItems[index];
     return item.isSvg
-        ? PhotoViewGalleryPageOptions.customChild(
-            child: SizedBox(
-              width: 300,
-              height: 300,
-              child: SvgPicture.asset(
-                item.resource,
-                height: 200.0,
-              ),
-            ),
+        ? PhotoView.customChild(
             childSize: const Size(300, 300),
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
             heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+            backgroundDecoration: widget.backgroundDecoration,
+            child: SizedBox(
+              width: 300,
+              height: 300,
+              child: SvgPicture.asset(item.resource, height: 200.0),
+            ),
           )
-        : PhotoViewGalleryPageOptions(
+        : PhotoView(
             imageProvider: AssetImage(item.resource),
             initialScale: PhotoViewComputedScale.contained,
             minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
             maxScale: PhotoViewComputedScale.covered * 4.1,
             heroAttributes: PhotoViewHeroAttributes(tag: item.id),
+            loadingBuilder: widget.loadingBuilder,
+            backgroundDecoration: widget.backgroundDecoration,
           );
   }
 }

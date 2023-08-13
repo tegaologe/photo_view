@@ -6,25 +6,25 @@ class CommonExampleRouteWrapper extends StatelessWidget {
     super.key,
     this.imageProvider,
     this.loadingBuilder,
-    this.backgroundDecoration,
+    this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.minScale,
     this.maxScale,
     this.initialScale,
     this.basePosition = Alignment.center,
     this.filterQuality = FilterQuality.none,
-    this.disableGestures,
+    this.disableGestures = false,
     this.errorBuilder,
   });
 
   final ImageProvider? imageProvider;
   final LoadingBuilder? loadingBuilder;
-  final BoxDecoration? backgroundDecoration;
+  final BoxDecoration backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
   final dynamic initialScale;
   final Alignment basePosition;
   final FilterQuality filterQuality;
-  final bool? disableGestures;
+  final bool disableGestures;
   final ImageErrorWidgetBuilder? errorBuilder;
 
   @override

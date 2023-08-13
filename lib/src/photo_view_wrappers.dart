@@ -45,9 +45,9 @@ class ImageWrapper extends StatefulWidget {
   final dynamic initialScale;
   final PhotoViewControllerBase controller;
   final Alignment? basePosition;
-  final PhotoViewImageTapUpCallback? onTapUp;
-  final PhotoViewImageTapDownCallback? onTapDown;
-  final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final GestureTapUpCallback? onTapUp;
+  final GestureTapDownCallback? onTapDown;
+  final GestureScaleEndCallback? onScaleEnd;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;
@@ -71,23 +71,23 @@ class _ImageWrapperState extends State<ImageWrapper> {
   StackTrace? _lastStack;
 
   @override
-  void dispose() {
-    super.dispose();
-    _stopImageStream();
-  }
-
-  @override
-  void didChangeDependencies() {
-    _resolveImage();
-    super.didChangeDependencies();
-  }
-
-  @override
   void didUpdateWidget(ImageWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.imageProvider != oldWidget.imageProvider) {
       _resolveImage();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _resolveImage();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _stopImageStream();
   }
 
   // retrieve image from the provider
@@ -155,6 +155,25 @@ class _ImageWrapperState extends State<ImageWrapper> {
     _imageStream?.removeListener(_imageStreamListener);
   }
 
+  Widget _buildLoading(BuildContext context) {
+    if (widget.loadingBuilder != null) {
+      return widget.loadingBuilder!(context, _loadingProgress);
+    }
+
+    return PhotoViewDefaultLoading(
+      event: _loadingProgress,
+    );
+  }
+
+  Widget _buildError(BuildContext context) {
+    if (widget.errorBuilder != null) {
+      return widget.errorBuilder!(context, _lastException!, _lastStack);
+    }
+    return PhotoViewDefaultError(
+      decoration: widget.backgroundDecoration,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -194,47 +213,26 @@ class _ImageWrapperState extends State<ImageWrapper> {
       enablePanAlways: widget.enablePanAlways ?? false,
     );
   }
-
-  Widget _buildLoading(BuildContext context) {
-    if (widget.loadingBuilder != null) {
-      return widget.loadingBuilder!(context, _loadingProgress);
-    }
-
-    return PhotoViewDefaultLoading(
-      event: _loadingProgress,
-    );
-  }
-
-  Widget _buildError(
-    BuildContext context,
-  ) {
-    if (widget.errorBuilder != null) {
-      return widget.errorBuilder!(context, _lastException!, _lastStack);
-    }
-    return PhotoViewDefaultError(
-      decoration: widget.backgroundDecoration,
-    );
-  }
 }
 
 class CustomChildWrapper extends StatelessWidget {
   const CustomChildWrapper({
     super.key,
-    this.child,
+    required this.child,
     required this.childSize,
     required this.backgroundDecoration,
-    this.heroAttributes,
+    required this.heroAttributes,
     required this.enableRotation,
     required this.controller,
     required this.maxScale,
     required this.minScale,
     required this.initialScale,
     required this.basePosition,
-    this.onTapUp,
-    this.onTapDown,
-    this.onScaleEnd,
+    required this.onTapUp,
+    required this.onTapDown,
+    required this.onScaleEnd,
     required this.outerSize,
-    this.gestureDetectorBehavior,
+    required this.gestureDetectorBehavior,
     required this.tightMode,
     required this.filterQuality,
     required this.disableGestures,
@@ -242,7 +240,7 @@ class CustomChildWrapper extends StatelessWidget {
     required this.strictScale,
   });
 
-  final Widget? child;
+  final Widget child;
   final Size? childSize;
   final Decoration backgroundDecoration;
   final PhotoViewHeroAttributes? heroAttributes;
@@ -252,9 +250,9 @@ class CustomChildWrapper extends StatelessWidget {
   final dynamic minScale;
   final dynamic initialScale;
   final Alignment? basePosition;
-  final PhotoViewImageTapUpCallback? onTapUp;
-  final PhotoViewImageTapDownCallback? onTapDown;
-  final PhotoViewImageScaleEndCallback? onScaleEnd;
+  final GestureTapUpCallback? onTapUp;
+  final GestureTapDownCallback? onTapDown;
+  final GestureScaleEndCallback? onScaleEnd;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
   final bool? tightMode;

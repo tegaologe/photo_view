@@ -8,9 +8,7 @@ import 'package:photo_view/src/utils/photo_view_utils.dart';
 /// It reacts to layout changes (eg: enter landscape or widget resize) and syncs the two controllers.
 mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   PhotoViewControllerBase get controller => widget.controller;
-
   ScaleBoundaries get scaleBoundaries => widget.scaleBoundaries;
-
   Alignment get basePosition => widget.basePosition;
 
   /// Mark if scale need recalculation, useful for scale boundaries changes.
@@ -31,23 +29,23 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   Offset get position => controller.position;
 
-  double get scale => controller.scale!;
+  double get scale {
+    final scaleExistsOnController = controller.scale != null;
+
+    if (markNeedsScaleRecalc || !scaleExistsOnController) {
+      final newScale = _clampSize(
+        scaleBoundaries.initialScale,
+        scaleBoundaries,
+      );
+      markNeedsScaleRecalc = false;
+      scale = newScale;
+      return newScale;
+    }
+
+    return controller.scale!;
+  }
 
   set scale(double scale) => controller.setScaleInvisibly(scale);
-
-  void updateMultiple({
-    Offset? position,
-    double? scale,
-    double? rotation,
-    Offset? rotationFocusPoint,
-  }) {
-    controller.updateMultiple(
-      position: position,
-      scale: scale,
-      rotation: rotation,
-      rotationFocusPoint: rotationFocusPoint,
-    );
-  }
 
   CornersRange cornersX({double? scale}) {
     final scale0 = scale ?? this.scale;
@@ -107,4 +105,8 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
     controller.removeIgnorableListener(_blindScaleListener);
     super.dispose();
   }
+}
+
+double _clampSize(double size, ScaleBoundaries scaleBoundaries) {
+  return size.clamp(scaleBoundaries.minScale, scaleBoundaries.maxScale);
 }
