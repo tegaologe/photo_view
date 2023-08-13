@@ -32,14 +32,14 @@ class PhotoView extends StatefulWidget {
     this.maxScale,
     this.minScale,
     this.initialScale,
-    this.basePosition,
+    this.basePosition = Alignment.center,
     this.onTapUp,
     this.onTapDown,
     this.onScaleEnd,
     this.customSize,
     this.gestureDetectorBehavior,
     this.tightMode = false,
-    this.filterQuality,
+    this.filterQuality = FilterQuality.none,
     this.disableGestures = false,
     this.errorBuilder,
     this.enablePanAlways = false,
@@ -59,14 +59,14 @@ class PhotoView extends StatefulWidget {
     this.maxScale,
     this.minScale,
     this.initialScale,
-    this.basePosition,
+    this.basePosition = Alignment.center,
     this.onTapUp,
     this.onTapDown,
     this.onScaleEnd,
     this.customSize,
     this.gestureDetectorBehavior,
     this.tightMode = false,
-    this.filterQuality,
+    this.filterQuality = FilterQuality.none,
     this.disableGestures = false,
     this.enablePanAlways = false,
     this.strictScale = false,
@@ -140,7 +140,7 @@ class PhotoView extends StatefulWidget {
   final PhotoViewController? controller;
 
   /// The alignment of the scale origin in relation to the widget size. Default is [Alignment.center]
-  final Alignment? basePosition;
+  final Alignment basePosition;
 
   /// A pointer that will trigger a tap has stopped contacting the screen at a
   /// particular location.
@@ -162,7 +162,7 @@ class PhotoView extends StatefulWidget {
   final bool tightMode;
 
   /// Quality levels for image filters.
-  final FilterQuality? filterQuality;
+  final FilterQuality filterQuality;
 
   // Removes gesture detector if `true`.
   // Useful when custom gesture detector is used in child widget.

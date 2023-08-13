@@ -44,17 +44,17 @@ class ImageWrapper extends StatefulWidget {
   final dynamic minScale;
   final dynamic initialScale;
   final PhotoViewController controller;
-  final Alignment? basePosition;
+  final Alignment basePosition;
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
   final GestureScaleEndCallback? onScaleEnd;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
-  final bool? tightMode;
-  final FilterQuality? filterQuality;
-  final bool? disableGestures;
-  final bool? enablePanAlways;
-  final bool? strictScale;
+  final bool tightMode;
+  final FilterQuality filterQuality;
+  final bool disableGestures;
+  final bool enablePanAlways;
+  final bool strictScale;
 
   @override
   State<ImageWrapper> createState() => _ImageWrapperState();
@@ -199,18 +199,18 @@ class _ImageWrapperState extends State<ImageWrapper> {
       gaplessPlayback: widget.gaplessPlayback,
       enableRotation: widget.enableRotation,
       heroAttributes: widget.heroAttributes,
-      basePosition: widget.basePosition ?? Alignment.center,
+      basePosition: widget.basePosition,
       controller: widget.controller,
-      strictScale: widget.strictScale ?? false,
+      strictScale: widget.strictScale,
       scaleBoundaries: scaleBoundaries,
       onTapUp: widget.onTapUp,
       onTapDown: widget.onTapDown,
       onScaleEnd: widget.onScaleEnd,
       gestureDetectorBehavior: widget.gestureDetectorBehavior,
-      tightMode: widget.tightMode ?? false,
-      filterQuality: widget.filterQuality ?? FilterQuality.none,
-      disableGestures: widget.disableGestures ?? false,
-      enablePanAlways: widget.enablePanAlways ?? false,
+      tightMode: widget.tightMode,
+      filterQuality: widget.filterQuality,
+      disableGestures: widget.disableGestures,
+      enablePanAlways: widget.enablePanAlways,
     );
   }
 }
@@ -249,17 +249,17 @@ class CustomChildWrapper extends StatelessWidget {
   final dynamic maxScale;
   final dynamic minScale;
   final dynamic initialScale;
-  final Alignment? basePosition;
+  final Alignment basePosition;
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
   final GestureScaleEndCallback? onScaleEnd;
   final Size outerSize;
   final HitTestBehavior? gestureDetectorBehavior;
-  final bool? tightMode;
-  final FilterQuality? filterQuality;
-  final bool? disableGestures;
-  final bool? enablePanAlways;
-  final bool? strictScale;
+  final bool tightMode;
+  final FilterQuality filterQuality;
+  final bool disableGestures;
+  final bool enablePanAlways;
+  final bool strictScale;
 
   @override
   Widget build(BuildContext context) {
@@ -277,17 +277,17 @@ class CustomChildWrapper extends StatelessWidget {
       enableRotation: enableRotation,
       heroAttributes: heroAttributes,
       controller: controller,
-      basePosition: basePosition ?? Alignment.center,
+      basePosition: basePosition,
       scaleBoundaries: scaleBoundaries,
-      strictScale: strictScale ?? false,
+      strictScale: strictScale,
       onTapUp: onTapUp,
       onTapDown: onTapDown,
       onScaleEnd: onScaleEnd,
       gestureDetectorBehavior: gestureDetectorBehavior,
-      tightMode: tightMode ?? false,
-      filterQuality: filterQuality ?? FilterQuality.none,
-      disableGestures: disableGestures ?? false,
-      enablePanAlways: enablePanAlways ?? false,
+      tightMode: tightMode,
+      filterQuality: filterQuality,
+      disableGestures: disableGestures,
+      enablePanAlways: enablePanAlways,
     );
   }
 }
