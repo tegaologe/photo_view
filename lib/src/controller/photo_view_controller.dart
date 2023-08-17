@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/src/utils/ignorable_change_notifier.dart';
 
-/// The state value stored and streamed by [PhotoViewController].
 @immutable
 class PhotoViewControllerValue {
   const PhotoViewControllerValue({
@@ -34,20 +33,8 @@ class PhotoViewControllerValue {
       scale.hashCode ^
       rotation.hashCode ^
       rotationFocusPoint.hashCode;
-
-  @override
-  String toString() {
-    return 'PhotoViewControllerValue{position: $position, scale: $scale, rotation: $rotation, rotationFocusPoint: $rotationFocusPoint}';
-  }
 }
 
-/// The default implementation of [PhotoViewControllerBase].
-///
-/// Containing a [ValueNotifier] it stores the state in the [value] field and streams
-/// updates via [outputStateStream].
-///
-/// For details of fields and methods, check [PhotoViewControllerBase].
-///
 class PhotoViewController {
   PhotoViewController({
     Offset initialPosition = Offset.zero,
@@ -62,27 +49,23 @@ class PhotoViewController {
           ),
         ),
         super() {
-    initial = value;
-    prevValue = initial;
+    _initial = value;
+    prevValue = _initial;
 
     _valueNotifier.addListener(_changeListener);
     _outputCtrl = StreamController<PhotoViewControllerValue>.broadcast();
-    _outputCtrl.sink.add(initial);
+    _outputCtrl.sink.add(_initial);
   }
 
   final IgnorableValueNotifier<PhotoViewControllerValue> _valueNotifier;
 
-  late PhotoViewControllerValue initial;
+  late PhotoViewControllerValue _initial;
 
   late StreamController<PhotoViewControllerValue> _outputCtrl;
 
   Stream<PhotoViewControllerValue> get outputStateStream => _outputCtrl.stream;
 
   late PhotoViewControllerValue prevValue;
-
-  void reset() {
-    value = initial;
-  }
 
   void _changeListener() {
     _outputCtrl.sink.add(value);

@@ -54,6 +54,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   @override
   void initState() {
     super.initState();
+
     initDelegate();
 
     _scaleAnimationController = AnimationController(vsync: this)
@@ -135,7 +136,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     final maxScale = scaleBoundaries.maxScale;
     final minScale = scaleBoundaries.minScale;
 
-    //animate back to maxScale if gesture exceeded the maxScale specified
+    // animate back to maxScale if gesture exceeded the maxScale specified
     if (scale > maxScale) {
       final scaleComebackRatio = maxScale / scale;
       _animateScale(scale, maxScale);
@@ -147,7 +148,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       return;
     }
 
-    //animate back to minScale if gesture fell smaller than the minScale specified
+    // animate back to minScale if gesture fell smaller than the minScale
+    // specified
     if (scale < minScale) {
       final scaleComebackRatio = minScale / scale;
       _animateScale(scale, minScale);
@@ -163,7 +165,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     // get magnitude from gesture velocity
     final magnitude = details.velocity.pixelsPerSecond.distance;
 
-    // animate velocity only if there is no scale change and a significant magnitude
+    // animate velocity only if there is no scale change and a significant
+    // magnitude
     if (_scaleBefore / scale == 1.0 && magnitude >= 400.0) {
       final direction = details.velocity.pixelsPerSecond / magnitude;
       _animatePosition(
@@ -245,10 +248,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     return StreamBuilder(
       stream: controller.outputStateStream,
       initialData: controller.prevValue,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<PhotoViewControllerValue> snapshot,
-      ) {
+      builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const SizedBox();
         }

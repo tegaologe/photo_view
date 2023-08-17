@@ -47,12 +47,6 @@ void main() {
     controller.setScaleInvisibly(2.0);
     expect(controller.scale, 2.0);
   });
-  test('controller reset', () {
-    controller.updateMultiple(position: const Offset(1, 1), rotation: 40);
-    controller.reset();
-    expect(controller.position, Offset.zero);
-    expect(controller.rotation, 0.0);
-  });
   test('controller stream mutation', () {
     const value1 = PhotoViewControllerValue(
       position: Offset.zero,
