@@ -89,17 +89,21 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void _handlePositionAnimate() {
-    controller.position = _positionAnimation.value;
+    controller.value = controller.value.copyWith(
+      position: _positionAnimation.value,
+    );
   }
 
   void _handleRotationAnimation() {
-    controller.rotation = _rotationAnimation.value;
+    controller.value = controller.value.copyWith(
+      rotation: _rotationAnimation.value,
+    );
   }
 
   void _onScaleStart(ScaleStartDetails details) {
-    _rotationBefore = controller.rotation;
+    _rotationBefore = controller.value.rotation;
     _scaleBefore = scale;
-    _normalizedPosition = details.focalPoint - controller.position;
+    _normalizedPosition = details.focalPoint - controller.value.position;
     _scaleAnimationController.stop();
     _positionAnimationController.stop();
     _rotationAnimationController.stop();
@@ -115,7 +119,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       return;
     }
 
-    controller.updateMultiple(
+    controller.value = controller.value.copyWith(
       scale: newScale,
       position: widget.decoration.enablePanAlways
           ? delta
@@ -132,7 +136,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     widget.decoration.onScaleEnd?.call(details);
 
     final scale = this.scale;
-    final position = controller.position;
+    final position = controller.value.position;
     final maxScale = scaleBoundaries.maxScale;
     final minScale = scaleBoundaries.minScale;
 
@@ -245,15 +249,9 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: controller.outputStateStream,
-      initialData: controller.prevValue,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox();
-        }
-
-        final value = snapshot.data!;
+    return ValueListenableBuilder(
+      valueListenable: controller,
+      builder: (_, value, __) {
         final useImageScale =
             widget.decoration.filterQuality != FilterQuality.none;
 

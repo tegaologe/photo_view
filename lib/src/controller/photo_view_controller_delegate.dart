@@ -15,22 +15,21 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   bool markNeedsScaleRecalc = true;
 
   void initDelegate() {
-    controller.addIgnorableListener(_blindScaleListener);
+    controller.addListener(_blindScaleListener);
   }
 
   void _blindScaleListener() {
     if (!widget.decoration.enablePanAlways) {
-      controller.position = clampPosition();
-    }
-    if (controller.scale == controller.prevValue.scale) {
-      return;
+      controller.value = controller.value.copyWith(
+        position: clampPosition(),
+      );
     }
   }
 
-  Offset get position => controller.position;
+  Offset get position => controller.value.position;
 
   double get scale {
-    final scaleExistsOnController = controller.scale != null;
+    final scaleExistsOnController = controller.value.scale != null;
 
     if (markNeedsScaleRecalc || !scaleExistsOnController) {
       final newScale = _clampSize(
@@ -42,10 +41,12 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
       return newScale;
     }
 
-    return controller.scale!;
+    return controller.value.scale!;
   }
 
-  set scale(double scale) => controller.setScaleInvisibly(scale);
+  set scale(double scale) => controller.value = controller.value.copyWith(
+        scale: scale,
+      );
 
   CornersRange cornersX({double? scale}) {
     final scale0 = scale ?? this.scale;
@@ -102,7 +103,7 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
 
   @override
   void dispose() {
-    controller.removeIgnorableListener(_blindScaleListener);
+    // controller.removeIgnorableListener(_blindScaleListener);
     super.dispose();
   }
 }

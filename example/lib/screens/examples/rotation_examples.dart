@@ -110,6 +110,8 @@ class _ProgrammaticRotationExampleState
   void _rotateRight90Degrees() {
     // Set the rotation to either 0, 90, 180 or 270 degrees (value is in radians)
     _quarterTurns = _quarterTurns == 3 ? 0 : _quarterTurns + 1;
-    _controller.rotation = math.pi / 2 * _quarterTurns;
+    _controller.value = _controller.value.copyWith(
+      rotation: _quarterTurns * (math.pi / 2),
+    );
   }
 }

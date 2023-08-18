@@ -141,7 +141,7 @@ class _PhotoViewImageState extends State<PhotoViewImage> {
             semanticLabel: widget.semanticLabel,
             gaplessPlayback: widget.gaplessPlayback,
             filterQuality: widget.decoration.filterQuality,
-            width: size.width * (widget.controller.scale ?? 1.0),
+            width: size.width * (widget.controller.value.scale ?? 1.0),
             fit: BoxFit.contain,
           ),
         ),
