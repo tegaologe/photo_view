@@ -51,23 +51,29 @@ class ScaleBoundaries {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ScaleBoundaries &&
-          runtimeType == other.runtimeType &&
-          _minScale == other._minScale &&
-          _maxScale == other._maxScale &&
-          _initialScale == other._initialScale &&
-          outerSize == other.outerSize &&
-          childSize == other.childSize;
+  String toString() {
+    return 'ScaleBoundaries(_minScale: $_minScale, _maxScale: $_maxScale, _initialScale: $_initialScale, outerSize: $outerSize, childSize: $childSize)';
+  }
 
   @override
-  int get hashCode =>
-      _minScale.hashCode ^
-      _maxScale.hashCode ^
-      _initialScale.hashCode ^
-      outerSize.hashCode ^
-      childSize.hashCode;
+  bool operator ==(covariant ScaleBoundaries other) {
+    if (identical(this, other)) return true;
+
+    return other._minScale == _minScale &&
+        other._maxScale == _maxScale &&
+        other._initialScale == _initialScale &&
+        other.outerSize == outerSize &&
+        other.childSize == childSize;
+  }
+
+  @override
+  int get hashCode {
+    return _minScale.hashCode ^
+        _maxScale.hashCode ^
+        _initialScale.hashCode ^
+        outerSize.hashCode ^
+        childSize.hashCode;
+  }
 }
 
 double _scaleForContained(Size size, Size childSize) {

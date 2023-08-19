@@ -30,6 +30,16 @@ class PhotoViewScaleValue extends PhotoViewScale {
   const PhotoViewScaleValue(this.scale);
 
   final double scale;
+
+  @override
+  bool operator ==(covariant PhotoViewScaleValue other) {
+    if (identical(this, other)) return true;
+
+    return other.scale == scale;
+  }
+
+  @override
+  int get hashCode => scale.hashCode;
 }
 
 class PhotoViewScaleContained extends PhotoViewScale {
@@ -37,6 +47,16 @@ class PhotoViewScaleContained extends PhotoViewScale {
   const PhotoViewScaleContained._(this.multiplier);
 
   final double multiplier;
+
+  @override
+  bool operator ==(covariant PhotoViewScaleContained other) {
+    if (identical(this, other)) return true;
+
+    return other.multiplier == multiplier;
+  }
+
+  @override
+  int get hashCode => multiplier.hashCode;
 }
 
 class PhotoViewScaleCovered extends PhotoViewScale {
@@ -44,4 +64,14 @@ class PhotoViewScaleCovered extends PhotoViewScale {
   const PhotoViewScaleCovered._(this.multiplier);
 
   final double multiplier;
+
+  @override
+  bool operator ==(covariant PhotoViewScaleCovered other) {
+    if (identical(this, other)) return true;
+
+    return other.multiplier == multiplier;
+  }
+
+  @override
+  int get hashCode => multiplier.hashCode;
 }

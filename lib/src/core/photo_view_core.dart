@@ -2,12 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:photo_view/photo_view.dart'
-    show PhotoViewDecoration, PhotoViewHeroAttributes;
-import 'package:photo_view/src/controller/photo_view_controller.dart';
-import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
-import 'package:photo_view/src/core/photo_view_hit_corners.dart';
 import 'package:photo_view/src/utils/scale_boundaries.dart';
 
 class PhotoViewCore extends StatefulWidget {
@@ -29,31 +26,35 @@ class PhotoViewCore extends StatefulWidget {
 }
 
 class PhotoViewCoreState extends State<PhotoViewCore>
-    with
-        TickerProviderStateMixin,
-        PhotoViewControllerDelegate,
-        HitCornersDetector {
+    with TickerProviderStateMixin {
+  late final AnimationController _scaleAnimationController;
+  late final AnimationController _positionAnimationController;
+  late final AnimationController _rotationAnimationController;
+
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _positionAnimation;
+  late Animation<double> _rotationAnimation;
+
+  late PhotoViewEdgeDetector _edgeDetector;
+
   late Offset _normalizedPosition;
   late double _scaleBefore;
   late double _rotationBefore;
 
-  late final AnimationController _scaleAnimationController;
-  late Animation<double> _scaleAnimation;
-
-  late final AnimationController _positionAnimationController;
-  late Animation<Offset> _positionAnimation;
-
-  late final AnimationController _rotationAnimationController;
-  late Animation<double> _rotationAnimation;
-
-  PhotoViewHeroAttributes? get heroAttributes =>
-      widget.decoration.heroAttributes;
+  Offset get position => widget.controller.value.position;
+  double get scale => widget.controller.value.scale!;
 
   @override
   void initState() {
     super.initState();
 
     widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
+
+    _edgeDetector = PhotoViewEdgeDetector(
+      controller: widget.controller,
+      scaleBoundaries: widget.scaleBoundaries,
+      basePosition: widget.decoration.basePosition,
+    );
 
     _scaleAnimationController = AnimationController(vsync: this)
       ..addListener(_handleScaleAnimation);
@@ -72,6 +73,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     if (oldWidget.scaleBoundaries != widget.scaleBoundaries) {
       widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
     }
+
+    _edgeDetector
+      ..controller = widget.controller
+      ..scaleBoundaries = widget.scaleBoundaries
+      ..basePosition = widget.decoration.basePosition;
   }
 
   @override
@@ -83,25 +89,27 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   void _handleScaleAnimation() {
-    scale = _scaleAnimation.value;
+    widget.controller.value = widget.controller.value.copyWith(
+      scale: _scaleAnimation.value,
+    );
   }
 
   void _handlePositionAnimate() {
-    controller.value = controller.value.copyWith(
+    widget.controller.value = widget.controller.value.copyWith(
       position: _positionAnimation.value,
     );
   }
 
   void _handleRotationAnimation() {
-    controller.value = controller.value.copyWith(
+    widget.controller.value = widget.controller.value.copyWith(
       rotation: _rotationAnimation.value,
     );
   }
 
   void _onScaleStart(ScaleStartDetails details) {
-    _rotationBefore = controller.value.rotation;
+    _rotationBefore = widget.controller.value.rotation;
     _scaleBefore = scale;
-    _normalizedPosition = details.focalPoint - controller.value.position;
+    _normalizedPosition = details.focalPoint - position;
     _scaleAnimationController.stop();
     _positionAnimationController.stop();
     _rotationAnimationController.stop();
@@ -117,11 +125,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       return;
     }
 
-    controller.value = controller.value.copyWith(
+    widget.controller.value = widget.controller.value.copyWith(
       scale: newScale,
       position: widget.decoration.enablePanAlways
           ? delta
-          : clampPosition(position: delta * details.scale),
+          : _edgeDetector.clampPosition(position: delta * details.scale),
       rotation: widget.decoration.enableRotation
           ? _rotationBefore + details.rotation
           : null,
@@ -134,15 +142,14 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     widget.decoration.onScaleEnd?.call(details);
 
     final scale = this.scale;
-    final position = controller.value.position;
-    final maxScale = scaleBoundaries.maxScale;
-    final minScale = scaleBoundaries.minScale;
+    final maxScale = widget.scaleBoundaries.maxScale;
+    final minScale = widget.scaleBoundaries.minScale;
 
     // animate back to maxScale if gesture exceeded the maxScale specified
     if (scale > maxScale) {
       final scaleComebackRatio = maxScale / scale;
       _animateScale(scale, maxScale);
-      final clampedPosition = clampPosition(
+      final clampedPosition = _edgeDetector.clampPosition(
         position: position * scaleComebackRatio,
         scale: maxScale,
       );
@@ -157,13 +164,14 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       _animateScale(scale, minScale);
       _animatePosition(
         position,
-        clampPosition(
+        _edgeDetector.clampPosition(
           position: position * scaleComebackRatio,
           scale: minScale,
         ),
       );
       return;
     }
+
     // get magnitude from gesture velocity
     final magnitude = details.velocity.pixelsPerSecond.distance;
 
@@ -173,7 +181,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
       final direction = details.velocity.pixelsPerSecond / magnitude;
       _animatePosition(
         position,
-        clampPosition(position: position + direction * 100.0),
+        _edgeDetector.clampPosition(position: position + direction * 100.0),
       );
     }
   }
@@ -231,13 +239,15 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   }
 
   Widget _buildChild() {
+    final heroAttributes = widget.decoration.heroAttributes;
+
     if (heroAttributes != null) {
       return Hero(
-        tag: heroAttributes!.tag,
-        createRectTween: heroAttributes!.createRectTween,
-        flightShuttleBuilder: heroAttributes!.flightShuttleBuilder,
-        placeholderBuilder: heroAttributes!.placeholderBuilder,
-        transitionOnUserGestures: heroAttributes!.transitionOnUserGestures,
+        tag: heroAttributes.tag,
+        createRectTween: heroAttributes.createRectTween,
+        flightShuttleBuilder: heroAttributes.flightShuttleBuilder,
+        placeholderBuilder: heroAttributes.placeholderBuilder,
+        transitionOnUserGestures: heroAttributes.transitionOnUserGestures,
         child: widget.child,
       );
     }
@@ -248,7 +258,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: controller,
+      valueListenable: widget.controller,
       builder: (_, value, __) {
         final useImageScale =
             widget.decoration.filterQuality != FilterQuality.none;
@@ -262,8 +272,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
         final customChildLayout = CustomSingleChildLayout(
           delegate: _CenterWithOriginalSizeDelegate(
-            scaleBoundaries.childSize,
-            basePosition,
+            widget.scaleBoundaries.childSize,
+            widget.decoration.basePosition,
             useImageScale,
           ),
           child: _buildChild(),
@@ -271,13 +281,13 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
         final child = Container(
           constraints: widget.decoration.tightMode
-              ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
+              ? BoxConstraints.tight(widget.scaleBoundaries.childSize * scale)
               : null,
           decoration: widget.decoration.backgroundDecoration,
           child: Center(
             child: Transform(
               transform: matrix,
-              alignment: basePosition,
+              alignment: widget.decoration.basePosition,
               child: customChildLayout,
             ),
           ),
@@ -290,10 +300,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         return Listener(
           onPointerSignal: _onPointerSignal,
           child: PhotoViewGestureDetector(
+            edgeDetector: _edgeDetector,
             onScaleStart: _onScaleStart,
             onScaleUpdate: _onScaleUpdate,
             onScaleEnd: _onScaleEnd,
-            hitDetector: this,
             onTapUp: widget.decoration.onTapUp,
             onTapDown: widget.decoration.onTapDown,
             child: child,
@@ -337,19 +347,8 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_CenterWithOriginalSizeDelegate oldDelegate) {
-    return oldDelegate != this;
+    return oldDelegate.subjectSize != subjectSize ||
+        oldDelegate.basePosition != basePosition ||
+        oldDelegate.useImageScale != useImageScale;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _CenterWithOriginalSizeDelegate &&
-          runtimeType == other.runtimeType &&
-          subjectSize == other.subjectSize &&
-          basePosition == other.basePosition &&
-          useImageScale == other.useImageScale;
-
-  @override
-  int get hashCode =>
-      subjectSize.hashCode ^ basePosition.hashCode ^ useImageScale.hashCode;
 }

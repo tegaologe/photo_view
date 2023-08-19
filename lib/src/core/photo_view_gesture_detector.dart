@@ -1,39 +1,32 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:photo_view/src/core/photo_view_hit_corners.dart';
+import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 
 class PhotoViewGestureDetector extends StatelessWidget {
   const PhotoViewGestureDetector({
     super.key,
-    this.hitDetector,
-    this.onScaleStart,
-    this.onScaleUpdate,
-    this.onScaleEnd,
-    this.child,
-    this.onTapUp,
-    this.onTapDown,
-    this.behavior,
+    required this.edgeDetector,
+    required this.onScaleStart,
+    required this.onScaleUpdate,
+    required this.onScaleEnd,
+    required this.child,
+    required this.onTapUp,
+    required this.onTapDown,
   });
 
-  final HitCornersDetector? hitDetector;
-
+  final PhotoViewEdgeDetector edgeDetector;
   final GestureScaleStartCallback? onScaleStart;
   final GestureScaleUpdateCallback? onScaleUpdate;
   final GestureScaleEndCallback? onScaleEnd;
-
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
-
   final Widget? child;
-
-  final HitTestBehavior? behavior;
 
   @override
   Widget build(BuildContext context) {
     final axis = PhotoViewGestureDetectorScope.maybeOf(context);
 
     return RawGestureDetector(
-      behavior: behavior,
       gestures: {
         if (onTapDown != null || onTapUp != null)
           TapGestureRecognizer:
@@ -46,7 +39,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
         _PhotoViewGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<_PhotoViewGestureRecognizer>(
           () => _PhotoViewGestureRecognizer(
-            hitDetector: hitDetector,
+            edgeDetector: edgeDetector,
             validateAxis: axis,
           ),
           (instance) => instance
@@ -63,11 +56,11 @@ class PhotoViewGestureDetector extends StatelessWidget {
 
 class _PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
   _PhotoViewGestureRecognizer({
-    this.hitDetector,
-    this.validateAxis,
+    required this.edgeDetector,
+    required this.validateAxis,
   });
 
-  final HitCornersDetector? hitDetector;
+  final PhotoViewEdgeDetector edgeDetector;
   final Axis? validateAxis;
 
   final _pointerLocations = <int, Offset>{};
@@ -137,7 +130,7 @@ class _PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     }
 
     final move = _initialFocalPoint! - _currentFocalPoint!;
-    final shouldMove = hitDetector!.shouldMove(move, validateAxis!);
+    final shouldMove = edgeDetector.canMove(move, validateAxis!);
 
     if (shouldMove || _pointerLocations.keys.length > 1) {
       acceptGesture(event.pointer);
