@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-/// Data class that holds the attributes that are going to be passed to
-/// [PhotoViewImageWrapper]'s [Hero].
 class PhotoViewHeroAttributes {
   const PhotoViewHeroAttributes({
     required this.tag,
@@ -11,18 +9,18 @@ class PhotoViewHeroAttributes {
     this.transitionOnUserGestures = false,
   });
 
-  /// Mirror to [Hero.tag]
+  /// Mirror to [Hero.tag].
   final Object tag;
 
-  /// Mirror to [Hero.createRectTween]
+  /// Mirror to [Hero.createRectTween].
   final CreateRectTween? createRectTween;
 
-  /// Mirror to [Hero.flightShuttleBuilder]
+  /// Mirror to [Hero.flightShuttleBuilder].
   final HeroFlightShuttleBuilder? flightShuttleBuilder;
 
-  /// Mirror to [Hero.placeholderBuilder]
+  /// Mirror to [Hero.placeholderBuilder].
   final HeroPlaceholderBuilder? placeholderBuilder;
 
-  /// Mirror to [Hero.transitionOnUserGestures]
+  /// Mirror to [Hero.transitionOnUserGestures].
   final bool transitionOnUserGestures;
 }

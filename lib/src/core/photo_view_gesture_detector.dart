@@ -5,6 +5,7 @@ import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 class PhotoViewGestureDetector extends StatelessWidget {
   const PhotoViewGestureDetector({
     super.key,
+    required this.behavior,
     required this.edgeDetector,
     required this.onScaleStart,
     required this.onScaleUpdate,
@@ -14,6 +15,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
     required this.onTapDown,
   });
 
+  final HitTestBehavior behavior;
   final PhotoViewEdgeDetector edgeDetector;
   final GestureScaleStartCallback? onScaleStart;
   final GestureScaleUpdateCallback? onScaleUpdate;
@@ -142,10 +144,11 @@ class _PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
 /// [_PhotoViewGestureRecognizer].
 ///
 /// When using this, PhotoView will test if the content zoomed has hit edge
-/// every time user pinches, if so, it will let parent gesture detectors win the gesture arena
+/// every time the user pinches, if so, it will let parent gesture detectors win
+/// the gesture arena.
 ///
-/// Useful when placing PhotoView inside a gesture sensitive context,
-/// such as [PageView], [Dismissible], [BottomSheet].
+/// Useful when placing PhotoView inside a gesture sensitive context, such as
+/// [PageView], [Dismissible], [BottomSheet].
 class PhotoViewGestureDetectorScope extends InheritedWidget {
   const PhotoViewGestureDetectorScope({
     super.key,

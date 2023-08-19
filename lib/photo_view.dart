@@ -26,13 +26,13 @@ class PhotoViewDecoration {
     this.heroAttributes,
     this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.gestureDetectorBehavior = HitTestBehavior.deferToChild,
-    this.basePosition = Alignment.center,
+    this.alignment = Alignment.center,
     this.filterQuality = FilterQuality.none,
     this.wantKeepAlive = false,
     this.enableRotation = false,
     this.tightMode = false,
     this.disableGestures = false,
-    this.enablePanAlways = false,
+    this.allowUnrestrictedPan = false,
     this.strictScale = false,
   });
 
@@ -43,17 +43,16 @@ class PhotoViewDecoration {
   final PhotoViewHeroAttributes? heroAttributes;
   final BoxDecoration backgroundDecoration;
   final HitTestBehavior gestureDetectorBehavior;
-  final Alignment basePosition;
+  final Alignment alignment;
   final FilterQuality filterQuality;
   final bool wantKeepAlive;
   final bool enableRotation;
   final bool tightMode;
   final bool disableGestures;
+  final bool allowUnrestrictedPan;
 
-  // TODO: move logic into ScaleBoundaries to allow for unbounded pan
-  final bool enablePanAlways;
-
-  /// Restricts the scale to the max and mix scale values when enabled.
+  /// Restricts the scale to the max and mix scale values when enabled, instead
+  /// of allowing to over-scale and animating back.
   final bool strictScale;
 }
 

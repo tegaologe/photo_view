@@ -39,7 +39,7 @@ class CommonExampleRouteWrapper extends StatelessWidget {
           loadingBuilder: loadingBuilder ?? (_, __) => const SizedBox(),
           decoration: PhotoViewDecoration(
             backgroundDecoration: backgroundDecoration,
-            basePosition: basePosition,
+            alignment: basePosition,
             filterQuality: filterQuality,
             disableGestures: disableGestures,
           ),

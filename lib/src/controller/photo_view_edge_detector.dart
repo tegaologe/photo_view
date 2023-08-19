@@ -6,10 +6,10 @@ class PhotoViewEdgeDetector {
   PhotoViewEdgeDetector({
     required PhotoViewController controller,
     required ScaleBoundaries scaleBoundaries,
-    required Alignment basePosition,
+    required Alignment alignment,
   })  : _controller = controller,
         _scaleBoundaries = scaleBoundaries,
-        _basePosition = basePosition;
+        _alignment = alignment;
 
   PhotoViewController _controller;
   set controller(PhotoViewController controller) => _controller = controller;
@@ -18,8 +18,8 @@ class PhotoViewEdgeDetector {
   set scaleBoundaries(ScaleBoundaries scaleBoundaries) =>
       _scaleBoundaries = scaleBoundaries;
 
-  Alignment _basePosition;
-  set basePosition(Alignment basePosition) => _basePosition = basePosition;
+  Alignment _alignment;
+  set alignment(Alignment alignment) => _alignment = alignment;
 
   Offset clampPosition({Offset? position, double? scale}) {
     scale ??= _controller.value.scale!;
@@ -59,7 +59,7 @@ class PhotoViewEdgeDetector {
     final computedWidth = _scaleBoundaries.childSize.width * scale;
     final screenWidth = _scaleBoundaries.outerSize.width;
 
-    final positionX = _basePosition.x;
+    final positionX = _alignment.x;
     final widthDiff = computedWidth - screenWidth;
 
     final minX = ((positionX - 1).abs() / 2) * widthDiff * -1;
@@ -74,7 +74,7 @@ class PhotoViewEdgeDetector {
     final computedHeight = _scaleBoundaries.childSize.height * scale;
     final screenHeight = _scaleBoundaries.outerSize.height;
 
-    final positionY = _basePosition.y;
+    final positionY = _alignment.y;
     final heightDiff = computedHeight - screenHeight;
 
     final minY = ((positionY - 1).abs() / 2) * heightDiff * -1;
@@ -83,76 +83,65 @@ class PhotoViewEdgeDetector {
     return (minY, maxY);
   }
 
-  _HitEdge _hitHorizontalEdge() {
+  (bool, bool) _hitHorizontalEdge() {
     final childWidth =
         _scaleBoundaries.childSize.width * _controller.value.scale!;
     final screenWidth = _scaleBoundaries.outerSize.width;
 
     if (screenWidth >= childWidth) {
-      return const _HitEdge(true, true);
+      return (true, true);
     }
 
     final x = -_controller.value.position.dx;
     final (min, max) = _horizontalEdge();
 
-    return _HitEdge(x <= min, x >= max);
+    return (x <= min, x >= max);
   }
 
-  _HitEdge _hitVerticalEdge() {
+  (bool, bool) _hitVerticalEdge() {
     final childHeight =
         _scaleBoundaries.childSize.height * _controller.value.scale!;
     final screenHeight = _scaleBoundaries.outerSize.height;
 
     if (screenHeight >= childHeight) {
-      return const _HitEdge(true, true);
+      return (true, true);
     }
 
     final y = -_controller.value.position.dy;
     final (min, max) = _verticalEdge();
 
-    return _HitEdge(y <= min, y >= max);
+    return (y <= min, y >= max);
   }
 
   bool _canMoveHorizontal(Offset move) {
-    final hitHorizontalEdge = _hitHorizontalEdge();
+    final hitEdge = _hitHorizontalEdge();
     final mainAxisMove = move.dx;
     final crossAxisMove = move.dy;
 
-    return _canMoveAxis(hitHorizontalEdge, mainAxisMove, crossAxisMove);
+    return _canMoveAxis(hitEdge, mainAxisMove, crossAxisMove);
   }
 
   bool _canMoveVertical(Offset move) {
-    final hitVerticalEdge = _hitVerticalEdge();
+    final hitEdge = _hitVerticalEdge();
     final mainAxisMove = move.dy;
     final crossAxisMove = move.dx;
 
-    return _canMoveAxis(hitVerticalEdge, mainAxisMove, crossAxisMove);
+    return _canMoveAxis(hitEdge, mainAxisMove, crossAxisMove);
   }
 
   bool _canMoveAxis(
-    _HitEdge hitEdge,
+    (bool, bool) hitEdge,
     double mainAxisMove,
     double crossAxisMove,
   ) {
     if (mainAxisMove == 0) {
       return false;
     }
-    if (!hitEdge.hasHitAny) {
+    if (!(hitEdge.$1 || hitEdge.$2)) {
       return true;
     }
-    final axisBlocked = hitEdge.hasHitBoth ||
-        (hitEdge.hasHitMax ? mainAxisMove > 0 : mainAxisMove < 0);
+    final axisBlocked = hitEdge.$1 && hitEdge.$2 ||
+        (hitEdge.$2 ? mainAxisMove > 0 : mainAxisMove < 0);
     return !axisBlocked;
   }
-}
-
-class _HitEdge {
-  const _HitEdge(this.hasHitMin, this.hasHitMax);
-
-  final bool hasHitMin;
-  final bool hasHitMax;
-
-  bool get hasHitAny => hasHitMin || hasHitMax;
-
-  bool get hasHitBoth => hasHitMin && hasHitMax;
 }

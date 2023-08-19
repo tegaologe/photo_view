@@ -53,7 +53,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _edgeDetector = PhotoViewEdgeDetector(
       controller: widget.controller,
       scaleBoundaries: widget.scaleBoundaries,
-      basePosition: widget.decoration.basePosition,
+      alignment: widget.decoration.alignment,
     );
 
     _scaleAnimationController = AnimationController(vsync: this)
@@ -77,7 +77,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _edgeDetector
       ..controller = widget.controller
       ..scaleBoundaries = widget.scaleBoundaries
-      ..basePosition = widget.decoration.basePosition;
+      ..alignment = widget.decoration.alignment;
   }
 
   @override
@@ -127,7 +127,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
     widget.controller.value = widget.controller.value.copyWith(
       scale: newScale,
-      position: widget.decoration.enablePanAlways
+      position: widget.decoration.allowUnrestrictedPan
           ? delta
           : _edgeDetector.clampPosition(position: delta * details.scale),
       rotation: widget.decoration.enableRotation
@@ -141,9 +141,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   void _onScaleEnd(ScaleEndDetails details) {
     widget.decoration.onScaleEnd?.call(details);
 
-    final scale = this.scale;
-    final maxScale = widget.scaleBoundaries.maxScale;
     final minScale = widget.scaleBoundaries.minScale;
+    final maxScale = widget.scaleBoundaries.maxScale;
 
     // animate back to maxScale if gesture exceeded the maxScale specified
     if (scale > maxScale) {
@@ -238,28 +237,12 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _onScaleEnd(ScaleEndDetails());
   }
 
-  Widget _buildChild() {
-    final heroAttributes = widget.decoration.heroAttributes;
-
-    if (heroAttributes != null) {
-      return Hero(
-        tag: heroAttributes.tag,
-        createRectTween: heroAttributes.createRectTween,
-        flightShuttleBuilder: heroAttributes.flightShuttleBuilder,
-        placeholderBuilder: heroAttributes.placeholderBuilder,
-        transitionOnUserGestures: heroAttributes.transitionOnUserGestures,
-        child: widget.child,
-      );
-    }
-
-    return widget.child;
-  }
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: widget.controller,
       builder: (_, value, __) {
+        final heroAttributes = widget.decoration.heroAttributes;
         final useImageScale =
             widget.decoration.filterQuality != FilterQuality.none;
 
@@ -270,26 +253,40 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           ..scale(computedScale)
           ..rotateZ(value.rotation);
 
-        final customChildLayout = CustomSingleChildLayout(
+        Widget child;
+
+        if (heroAttributes != null) {
+          child = Hero(
+            tag: heroAttributes.tag,
+            createRectTween: heroAttributes.createRectTween,
+            flightShuttleBuilder: heroAttributes.flightShuttleBuilder,
+            placeholderBuilder: heroAttributes.placeholderBuilder,
+            transitionOnUserGestures: heroAttributes.transitionOnUserGestures,
+            child: widget.child,
+          );
+        } else {
+          child = widget.child;
+        }
+
+        child = CustomSingleChildLayout(
           delegate: _CenterWithOriginalSizeDelegate(
             widget.scaleBoundaries.childSize,
-            widget.decoration.basePosition,
+            widget.decoration.alignment,
             useImageScale,
           ),
-          child: _buildChild(),
+          child: child,
         );
 
-        final child = Container(
+        child = Container(
+          alignment: Alignment.center,
           constraints: widget.decoration.tightMode
               ? BoxConstraints.tight(widget.scaleBoundaries.childSize * scale)
               : null,
           decoration: widget.decoration.backgroundDecoration,
-          child: Center(
-            child: Transform(
-              transform: matrix,
-              alignment: widget.decoration.basePosition,
-              child: customChildLayout,
-            ),
+          child: Transform(
+            transform: matrix,
+            alignment: widget.decoration.alignment,
+            child: child,
           ),
         );
 
@@ -300,6 +297,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
         return Listener(
           onPointerSignal: _onPointerSignal,
           child: PhotoViewGestureDetector(
+            behavior: widget.decoration.gestureDetectorBehavior,
             edgeDetector: _edgeDetector,
             onScaleStart: _onScaleStart,
             onScaleUpdate: _onScaleUpdate,
@@ -317,12 +315,12 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
   const _CenterWithOriginalSizeDelegate(
     this.subjectSize,
-    this.basePosition,
+    this.alignment,
     this.useImageScale,
   );
 
   final Size subjectSize;
-  final Alignment basePosition;
+  final Alignment alignment;
   final bool useImageScale;
 
   @override
@@ -333,8 +331,8 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
     final halfWidth = (size.width - childWidth) / 2;
     final halfHeight = (size.height - childHeight) / 2;
 
-    final offsetX = halfWidth * (basePosition.x + 1);
-    final offsetY = halfHeight * (basePosition.y + 1);
+    final offsetX = halfWidth * (alignment.x + 1);
+    final offsetY = halfHeight * (alignment.y + 1);
     return Offset(offsetX, offsetY);
   }
 
@@ -348,7 +346,7 @@ class _CenterWithOriginalSizeDelegate extends SingleChildLayoutDelegate {
   @override
   bool shouldRelayout(_CenterWithOriginalSizeDelegate oldDelegate) {
     return oldDelegate.subjectSize != subjectSize ||
-        oldDelegate.basePosition != basePosition ||
+        oldDelegate.alignment != alignment ||
         oldDelegate.useImageScale != useImageScale;
   }
 }
