@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
-import 'package:photo_view/src/utils/photo_view_utils.dart';
+import 'package:photo_view/src/utils/scale_boundaries.dart';
 
 class PhotoViewImage extends StatefulWidget {
   const PhotoViewImage({
@@ -27,9 +27,9 @@ class PhotoViewImage extends StatefulWidget {
   final PhotoViewDecoration decoration;
   final String? semanticLabel;
   final bool gaplessPlayback;
-  final dynamic minScale;
-  final dynamic maxScale;
-  final dynamic initialScale;
+  final PhotoViewScale minScale;
+  final PhotoViewScale maxScale;
+  final PhotoViewScale initialScale;
   final Size outerSize;
 
   @override
@@ -130,9 +130,9 @@ class _PhotoViewImageState extends State<PhotoViewImage> {
           controller: widget.controller,
           decoration: widget.decoration,
           scaleBoundaries: ScaleBoundaries(
-            widget.minScale ?? 0.0,
-            widget.maxScale ?? double.infinity,
-            widget.initialScale ?? PhotoViewComputedScale.contained,
+            widget.minScale,
+            widget.maxScale,
+            widget.initialScale,
             widget.outerSize,
             size,
           ),

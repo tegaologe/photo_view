@@ -28,7 +28,6 @@ class CustomChildExample extends StatelessWidget {
             height: 450.0,
             child: ClipRect(
               child: PhotoView.custom(
-                initialScale: 1.0,
                 child: Container(
                   decoration:
                       const BoxDecoration(color: Colors.lightGreenAccent),

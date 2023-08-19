@@ -7,9 +7,9 @@ class CommonExampleRouteWrapper extends StatelessWidget {
     required this.imageProvider,
     this.loadingBuilder,
     this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
-    this.minScale,
-    this.maxScale,
-    this.initialScale,
+    this.minScale = const PhotoViewScale.value(0),
+    this.maxScale = const PhotoViewScale.value(double.infinity),
+    this.initialScale = const PhotoViewScale.contained(),
     this.basePosition = Alignment.center,
     this.filterQuality = FilterQuality.none,
     this.disableGestures = false,
@@ -19,9 +19,9 @@ class CommonExampleRouteWrapper extends StatelessWidget {
   final ImageProvider imageProvider;
   final PhotoViewImageLoadingBuilder? loadingBuilder;
   final BoxDecoration backgroundDecoration;
-  final dynamic minScale;
-  final dynamic maxScale;
-  final dynamic initialScale;
+  final PhotoViewScale minScale;
+  final PhotoViewScale maxScale;
+  final PhotoViewScale initialScale;
   final Alignment basePosition;
   final FilterQuality filterQuality;
   final bool disableGestures;

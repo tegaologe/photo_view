@@ -157,9 +157,8 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
     return item.isSvg
         ? PhotoView.custom(
             childSize: const Size(300, 300),
-            initialScale: PhotoViewComputedScale.contained,
-            minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
-            maxScale: PhotoViewComputedScale.covered * 4.1,
+            minScale: const PhotoViewScale.contained() * (0.5 + index / 10),
+            maxScale: const PhotoViewScale.covered() * 4.1,
             decoration: PhotoViewDecoration(
               heroAttributes: PhotoViewHeroAttributes(tag: item.id),
               backgroundDecoration: widget.backgroundDecoration,
@@ -172,9 +171,8 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
           )
         : PhotoView(
             imageProvider: AssetImage(item.resource),
-            initialScale: PhotoViewComputedScale.contained,
-            minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
-            maxScale: PhotoViewComputedScale.covered * 4.1,
+            minScale: const PhotoViewScale.contained() * (0.5 + index / 10),
+            maxScale: const PhotoViewScale.covered() * 4.1,
             loadingBuilder:
                 widget.loadingBuilder ?? (_, __) => const SizedBox(),
             decoration: PhotoViewDecoration(

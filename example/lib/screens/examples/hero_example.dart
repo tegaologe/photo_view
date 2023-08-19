@@ -44,14 +44,14 @@ class HeroPhotoViewRouteWrapper extends StatelessWidget {
     super.key,
     required this.imageProvider,
     this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
-    this.minScale,
-    this.maxScale,
+    this.minScale = const PhotoViewScale.value(0),
+    this.maxScale = const PhotoViewScale.value(double.infinity),
   });
 
   final ImageProvider imageProvider;
   final BoxDecoration backgroundDecoration;
-  final dynamic minScale;
-  final dynamic maxScale;
+  final PhotoViewScale minScale;
+  final PhotoViewScale maxScale;
 
   @override
   Widget build(BuildContext context) {

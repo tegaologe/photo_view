@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:photo_view/src/controller/photo_view_controller.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
-import 'package:photo_view/src/photo_view_computed_scale.dart';
 import 'package:photo_view/src/photo_view_image.dart';
-import 'package:photo_view/src/utils/photo_view_hero_attributes.dart';
-import 'package:photo_view/src/utils/photo_view_utils.dart';
+import 'package:photo_view/src/utils/scale_boundaries.dart';
 
 export 'src/controller/photo_view_controller.dart';
 export 'src/core/photo_view_gesture_detector.dart'
     show PhotoViewGestureDetectorScope;
-export 'src/photo_view_computed_scale.dart';
+export 'src/core/photo_view_scale.dart';
 export 'src/utils/photo_view_hero_attributes.dart';
 
 typedef PhotoViewImageLoadingBuilder = Widget Function(
@@ -51,6 +49,8 @@ class PhotoViewDecoration {
   final bool enableRotation;
   final bool tightMode;
   final bool disableGestures;
+
+  // TODO: move logic into ScaleBoundaries to allow for unbounded pan
   final bool enablePanAlways;
 
   /// Restricts the scale to the max and mix scale values when enabled.
@@ -67,9 +67,9 @@ class PhotoView extends StatefulWidget {
     this.gaplessPlayback = false,
     this.controller,
     this.decoration = const PhotoViewDecoration(),
-    this.minScale,
-    this.maxScale,
-    this.initialScale,
+    this.minScale = const PhotoViewScale.value(0),
+    this.maxScale = const PhotoViewScale.value(double.infinity),
+    this.initialScale = const PhotoViewScale.contained(),
     this.customSize,
   })  : child = null,
         childSize = null;
@@ -80,9 +80,9 @@ class PhotoView extends StatefulWidget {
     this.childSize,
     this.controller,
     this.decoration = const PhotoViewDecoration(),
-    this.minScale,
-    this.maxScale,
-    this.initialScale,
+    this.minScale = const PhotoViewScale.value(0),
+    this.maxScale = const PhotoViewScale.value(double.infinity),
+    this.initialScale = const PhotoViewScale.contained(),
     this.customSize,
   })  : errorBuilder = null,
         imageProvider = null,
@@ -110,22 +110,16 @@ class PhotoView extends StatefulWidget {
   final PhotoViewDecoration decoration;
 
   /// Defines the minimum size in which the image will be allowed to assume, it
-  /// is proportional to the original image size. Can be either a double
-  /// (absolute value) or a [PhotoViewComputedScale], that can be multiplied by
-  /// a double
-  final dynamic minScale;
+  /// is proportional to the original image size.
+  final PhotoViewScale minScale;
 
   /// Defines the maximum size in which the image will be allowed to assume, it
-  /// is proportional to the original image size. Can be either a double
-  /// (absolute value) or a [PhotoViewComputedScale], that can be multiplied by
-  /// a double
-  final dynamic maxScale;
+  /// is proportional to the original image size.
+  final PhotoViewScale maxScale;
 
   /// Defines the initial size in which the image will be assume in the mounting
-  /// of the component, it is proportional to the original image size. Can be
-  /// either a double (absolute value) or a [PhotoViewComputedScale], that can
-  /// be multiplied by a double
-  final dynamic initialScale;
+  /// of the component, it is proportional to the original image size.
+  final PhotoViewScale initialScale;
 
   final Size? customSize;
 
@@ -174,7 +168,7 @@ class _PhotoViewState extends State<PhotoView>
     super.build(context);
 
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (_, constraints) {
         final parentSize = widget.customSize ?? constraints.biggest;
 
         if (widget.child != null) {
@@ -182,9 +176,9 @@ class _PhotoViewState extends State<PhotoView>
             decoration: widget.decoration,
             controller: _controller,
             scaleBoundaries: ScaleBoundaries(
-              widget.minScale ?? 0.0,
-              widget.maxScale ?? double.infinity,
-              widget.initialScale ?? PhotoViewComputedScale.contained,
+              widget.minScale,
+              widget.maxScale,
+              widget.initialScale,
               parentSize,
               widget.childSize ?? parentSize,
             ),

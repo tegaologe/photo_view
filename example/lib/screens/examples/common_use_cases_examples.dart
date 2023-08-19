@@ -98,9 +98,9 @@ class CommonUseCasesExamples extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => CommonExampleRouteWrapper(
                     imageProvider: const AssetImage("assets/large-image.jpg"),
-                    minScale: PhotoViewComputedScale.contained * 0.8,
-                    maxScale: PhotoViewComputedScale.covered * 1.1,
-                    initialScale: PhotoViewComputedScale.covered * 1.1,
+                    minScale: const PhotoViewScale.contained() * 0.8,
+                    maxScale: const PhotoViewScale.covered() * 1.1,
+                    initialScale: const PhotoViewScale.covered() * 1.1,
                   ),
                 ),
               );
@@ -114,7 +114,7 @@ class CommonUseCasesExamples extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => CommonExampleRouteWrapper(
                     imageProvider: const AssetImage("assets/large-image.jpg"),
-                    initialScale: PhotoViewComputedScale.contained * 0.7,
+                    initialScale: const PhotoViewScale.contained() * 0.7,
                   ),
                 ),
               );

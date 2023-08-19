@@ -8,10 +8,8 @@ import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
-import 'package:photo_view/src/utils/photo_view_utils.dart';
+import 'package:photo_view/src/utils/scale_boundaries.dart';
 
-/// Internal widget in which controls all animations lifecycle, core responses
-/// to user gestures, updates to  the controller state and mounts the entire PhotoView Layout
 class PhotoViewCore extends StatefulWidget {
   const PhotoViewCore({
     super.key,
@@ -55,7 +53,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   void initState() {
     super.initState();
 
-    initDelegate();
+    widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
 
     _scaleAnimationController = AnimationController(vsync: this)
       ..addListener(_handleScaleAnimation);
@@ -72,7 +70,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.scaleBoundaries != widget.scaleBoundaries) {
-      markNeedsScaleRecalc = true;
+      widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
     }
   }
 

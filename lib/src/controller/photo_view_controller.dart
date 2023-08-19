@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 @immutable
@@ -47,17 +48,32 @@ class PhotoViewControllerValue {
   }
 }
 
-class PhotoViewController extends ValueNotifier<PhotoViewControllerValue> {
+class PhotoViewController extends ChangeNotifier
+    implements ValueListenable<PhotoViewControllerValue> {
   PhotoViewController({
     Offset initialPosition = Offset.zero,
     double initialRotation = 0.0,
     double? initialScale,
-  }) : super(
-          PhotoViewControllerValue(
-            position: initialPosition,
-            rotation: initialRotation,
-            scale: initialScale,
-            rotationFocusPoint: null,
-          ),
+  }) : _value = PhotoViewControllerValue(
+          position: initialPosition,
+          rotation: initialRotation,
+          scale: initialScale,
+          rotationFocusPoint: null,
         );
+
+  @override
+  PhotoViewControllerValue get value => _value;
+  late PhotoViewControllerValue _value;
+  set value(PhotoViewControllerValue value) {
+    if (_value == value) {
+      return;
+    }
+    _value = value;
+    notifyListeners();
+  }
+
+  /// Sets the controller's scale without updating any listeners.
+  void initializeScale(double scale) {
+    _value = _value.copyWith(scale: scale);
+  }
 }

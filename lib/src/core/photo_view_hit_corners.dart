@@ -1,9 +1,15 @@
 import 'package:flutter/widgets.dart';
-
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart'
     show PhotoViewControllerDelegate;
 
 mixin HitCornersDetector on PhotoViewControllerDelegate {
+  bool shouldMove(Offset move, Axis mainAxis) {
+    return switch (mainAxis) {
+      Axis.horizontal => _shouldMoveX(move),
+      Axis.vertical => _shouldMoveY(move),
+    };
+  }
+
   HitCorners _hitCornersX() {
     final childWidth = scaleBoundaries.childSize.width * scale;
     final screenWidth = scaleBoundaries.outerSize.width;
@@ -11,8 +17,8 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
       return const HitCorners(true, true);
     }
     final x = -position.dx;
-    final cornersX = this.cornersX();
-    return HitCorners(x <= cornersX.min, x >= cornersX.max);
+    final (min, max) = cornersX();
+    return HitCorners(x <= min, x >= max);
   }
 
   HitCorners _hitCornersY() {
@@ -22,8 +28,8 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
       return const HitCorners(true, true);
     }
     final y = -position.dy;
-    final cornersY = this.cornersY();
-    return HitCorners(y <= cornersY.min, y >= cornersY.max);
+    final (min, max) = cornersY();
+    return HitCorners(y <= min, y >= max);
   }
 
   bool _shouldMoveAxis(
@@ -59,13 +65,6 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
     final crossAxisMove = move.dx;
 
     return _shouldMoveAxis(hitCornersY, mainAxisMove, crossAxisMove);
-  }
-
-  bool shouldMove(Offset move, Axis mainAxis) {
-    if (mainAxis == Axis.vertical) {
-      return _shouldMoveY(move);
-    }
-    return _shouldMoveX(move);
   }
 }
 
