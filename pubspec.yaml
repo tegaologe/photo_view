@@ -1,6 +1,6 @@
 name: photo_view
-description: Photo View provides a gesture sensitive zoomable widget. Photo View is largely used to show interactive images and other stuff such as SVG.
-version: 0.14.0
+description: photo_view fork
+version: 0.1.0
 homepage: https://github.com/robertodoering/photo_view
 
 environment:
