@@ -38,7 +38,7 @@ class ExampleButtonNode extends StatelessWidget {
               ),
               child: const Text("Open example"),
             ),
-          )
+          ),
         ],
       ),
     );

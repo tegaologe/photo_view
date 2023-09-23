@@ -43,7 +43,7 @@ class CustomChildExample extends StatelessWidget {
                       SvgPicture.asset(
                         "assets/firefox.svg",
                         height: 250.0,
-                      )
+                      ),
                     ],
                   ),
                 ),

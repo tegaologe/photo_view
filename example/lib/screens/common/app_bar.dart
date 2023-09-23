@@ -26,7 +26,7 @@ class ExampleAppBar extends StatelessWidget {
               color: Colors.black12,
               spreadRadius: 10.0,
               blurRadius: 20.0,
-            )
+            ),
           ],
         ),
         child: Row(
@@ -52,7 +52,7 @@ class ExampleAppBar extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

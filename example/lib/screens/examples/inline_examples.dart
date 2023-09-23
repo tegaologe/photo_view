@@ -32,7 +32,7 @@ class InlineExample extends StatelessWidget {
                 minScale: const PhotoViewScale.contained() * 0.8,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

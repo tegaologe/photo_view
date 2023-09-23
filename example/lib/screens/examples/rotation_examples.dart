@@ -97,7 +97,7 @@ class _ProgrammaticRotationExampleState
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
