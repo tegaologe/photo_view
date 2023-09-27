@@ -11,6 +11,8 @@ class PhotoViewEdgeDetector {
         _scaleBoundaries = scaleBoundaries,
         _alignment = alignment;
 
+  static const _edgeEpsilon = 5;
+
   PhotoViewController _controller;
   set controller(PhotoViewController controller) => _controller = controller;
 
@@ -95,7 +97,7 @@ class PhotoViewEdgeDetector {
     final x = -_controller.value.position.dx;
     final (min, max) = _horizontalEdge();
 
-    return (x <= min, x >= max);
+    return (x <= min + _edgeEpsilon, x >= max - _edgeEpsilon);
   }
 
   (bool, bool) _hitVerticalEdge() {
@@ -110,15 +112,15 @@ class PhotoViewEdgeDetector {
     final y = -_controller.value.position.dy;
     final (min, max) = _verticalEdge();
 
-    return (y <= min, y >= max);
+    return (y <= min + _edgeEpsilon, y >= max - _edgeEpsilon);
   }
 
   bool _canMoveHorizontal(Offset move) {
     final hitEdge = _hitHorizontalEdge();
-    final mainAxisMove = move.dx;
-    final crossAxisMove = move.dy;
+    final mainAxisDelta = move.dx;
+    final crossAxisDelta = move.dy;
 
-    return _canMoveAxis(hitEdge, mainAxisMove, crossAxisMove);
+    return _canMoveAxis(hitEdge, mainAxisDelta, crossAxisDelta);
   }
 
   bool _canMoveVertical(Offset move) {
@@ -131,17 +133,22 @@ class PhotoViewEdgeDetector {
 
   bool _canMoveAxis(
     (bool, bool) hitEdge,
-    double mainAxisMove,
-    double crossAxisMove,
+    double mainAxisDelta,
+    double crossAxisDelta,
   ) {
-    if (mainAxisMove == 0) {
+    if (mainAxisDelta == 0) {
       return false;
     }
-    if (!(hitEdge.$1 || hitEdge.$2)) {
+
+    final (hitStart, hitEnd) = hitEdge;
+
+    if (!(hitStart || hitEnd)) {
       return true;
     }
-    final axisBlocked = hitEdge.$1 && hitEdge.$2 ||
-        (hitEdge.$2 ? mainAxisMove > 0 : mainAxisMove < 0);
+
+    final axisBlocked =
+        hitStart && hitEnd || (hitEnd ? mainAxisDelta > 0 : mainAxisDelta < 0);
+
     return !axisBlocked;
   }
 }
