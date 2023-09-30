@@ -2,7 +2,7 @@ sealed class PhotoViewScale {
   const PhotoViewScale();
   const factory PhotoViewScale.value(double scale) = PhotoViewScaleValue;
   const factory PhotoViewScale.contained() = PhotoViewScaleContained;
-  const factory PhotoViewScale.covered() = PhotoViewScaleContained;
+  const factory PhotoViewScale.covered() = PhotoViewScaleCovered;
 
   PhotoViewScale operator *(double multiplier) {
     return switch (this) {
