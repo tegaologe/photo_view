@@ -9,7 +9,16 @@ typedef PhotoViewImageLoadingBuilder = Widget Function(
   ImageChunkEvent? event,
 );
 
-Widget _defaultLoadingBuilder(_, __) => const SizedBox();
+Widget _defaultLoadingBuilder(_, ImageChunkEvent? event) {
+  return Center(
+    child: CircularProgressIndicator(
+      value: event == null || event.expectedTotalBytes == null
+          ? null
+          : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+    ),
+  );
+}
+
 Widget _defaultErrorBuilder(_, __, ___) => const SizedBox();
 
 class PhotoViewDecoration {
