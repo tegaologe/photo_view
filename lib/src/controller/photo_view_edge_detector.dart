@@ -11,6 +11,8 @@ class PhotoViewEdgeDetector {
         _scaleBoundaries = scaleBoundaries,
         _alignment = alignment;
 
+  /// The distance away from the edge that the position must be in to be
+  /// considered "on the edge".
   static const _edgeEpsilon = 5;
 
   PhotoViewController _controller;
@@ -48,10 +50,10 @@ class PhotoViewEdgeDetector {
     return Offset(finalX, finalY);
   }
 
-  bool canMove(Offset move, Axis mainAxis) {
+  bool canMove(Offset delta, Axis mainAxis) {
     return switch (mainAxis) {
-      Axis.horizontal => _canMoveHorizontal(move),
-      Axis.vertical => _canMoveVertical(move),
+      Axis.horizontal => _canMoveHorizontal(delta),
+      Axis.vertical => _canMoveVertical(delta),
     };
   }
 

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/utils/scale_boundaries.dart';
 
@@ -48,13 +47,15 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   void initState() {
     super.initState();
 
-    widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
-
     _edgeDetector = PhotoViewEdgeDetector(
       controller: widget.controller,
       scaleBoundaries: widget.scaleBoundaries,
       alignment: widget.decoration.alignment,
     );
+
+    widget.controller.edgeDetector = _edgeDetector;
+    widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
+    widget.controller.initializePosition(_edgeDetector.clampPosition());
 
     _scaleAnimationController = AnimationController(vsync: this)
       ..addListener(_handleScaleAnimation);
@@ -72,6 +73,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
     if (oldWidget.scaleBoundaries != widget.scaleBoundaries) {
       widget.controller.initializeScale(widget.scaleBoundaries.initialScale);
+      widget.controller.initializePosition(_edgeDetector.clampPosition());
     }
 
     _edgeDetector

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 
 class PhotoViewController extends ChangeNotifier
     implements ValueListenable<PhotoViewControllerValue> {
@@ -14,6 +15,11 @@ class PhotoViewController extends ChangeNotifier
           rotationFocusPoint: null,
         );
 
+  /// Can be used to detect whether an image is on the edge of the screen.
+  ///
+  /// Initialized when the controller is attached to a [PhotoView] widget.
+  late PhotoViewEdgeDetector edgeDetector;
+
   @override
   PhotoViewControllerValue get value => _value;
   late PhotoViewControllerValue _value;
@@ -25,9 +31,14 @@ class PhotoViewController extends ChangeNotifier
     notifyListeners();
   }
 
-  /// Sets the controller's scale without updating any listeners.
+  /// Sets the scale without updating any listeners.
   void initializeScale(double scale) {
     _value = _value.copyWith(scale: scale);
+  }
+
+  /// Sets the position without updating any listeners.
+  void initializePosition(Offset position) {
+    _value = _value.copyWith(position: position);
   }
 }
 
@@ -57,6 +68,11 @@ class PhotoViewControllerValue {
       rotation: rotation ?? this.rotation,
       rotationFocusPoint: rotationFocusPoint ?? this.rotationFocusPoint,
     );
+  }
+
+  @override
+  String toString() {
+    return 'PhotoViewControllerValue(position: $position, scale: $scale, rotation: $rotation, rotationFocusPoint: $rotationFocusPoint)';
   }
 
   @override

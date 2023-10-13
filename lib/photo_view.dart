@@ -1,4 +1,5 @@
 export 'src/controller/photo_view_controller.dart';
+export 'src/controller/photo_view_edge_detector.dart';
 export 'src/core/photo_view_gesture_detector.dart'
     show PhotoViewGestureDetectorScope;
 export 'src/core/photo_view_scale.dart';

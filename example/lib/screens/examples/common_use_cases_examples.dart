@@ -15,6 +15,37 @@ class CommonUseCasesExamples extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           ExampleButtonNode(
+            title: "Large Image contained",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CommonExampleRouteWrapper(
+                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    minScale: const PhotoViewScale.contained(),
+                    maxScale: const PhotoViewScale.covered() * 2.5,
+                  ),
+                ),
+              );
+            },
+          ),
+          ExampleButtonNode(
+            title: "Large Image covered",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CommonExampleRouteWrapper(
+                    imageProvider: const AssetImage("assets/large-image.jpg"),
+                    initialScale: const PhotoViewScale.covered(),
+                    minScale: const PhotoViewScale.contained(),
+                    maxScale: const PhotoViewScale.covered() * 2.5,
+                  ),
+                ),
+              );
+            },
+          ),
+          ExampleButtonNode(
             title: "Large Image",
             onPressed: () {
               Navigator.push(
