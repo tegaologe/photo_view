@@ -3,17 +3,17 @@ import 'package:flutter/widgets.dart';
 import 'package:photo_view/src/controller/photo_view_edge_detector.dart';
 
 class PhotoViewGestureDetector extends StatelessWidget {
-  const PhotoViewGestureDetector({
-    super.key,
-    required this.behavior,
-    required this.edgeDetector,
-    required this.onScaleStart,
-    required this.onScaleUpdate,
-    required this.onScaleEnd,
-    required this.child,
-    required this.onTapUp,
-    required this.onTapDown,
-  });
+  const PhotoViewGestureDetector(
+      {super.key,
+      required this.behavior,
+      required this.edgeDetector,
+      required this.onScaleStart,
+      required this.onScaleUpdate,
+      required this.onScaleEnd,
+      required this.child,
+      required this.onTapUp,
+      required this.onTapDown,
+      required this.disableGestures});
 
   final HitTestBehavior behavior;
   final PhotoViewEdgeDetector edgeDetector;
@@ -23,6 +23,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
   final Widget? child;
+  final bool disableGestures;
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +47,9 @@ class PhotoViewGestureDetector extends StatelessWidget {
           ),
           (instance) => instance
             ..dragStartBehavior = DragStartBehavior.start
-            ..onStart = onScaleStart
-            ..onUpdate = onScaleUpdate
-            ..onEnd = onScaleEnd,
+            ..onStart = disableGestures == true ? null : onScaleStart
+            ..onUpdate = disableGestures == true ? null : onScaleUpdate
+            ..onEnd = disableGestures == true ? null : onScaleEnd,
         ),
       },
       child: child,

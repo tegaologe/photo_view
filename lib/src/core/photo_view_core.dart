@@ -292,9 +292,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
           ),
         );
 
+        /*
         if (widget.decoration.disableGestures) {
           return child;
         }
+        */
 
         return Listener(
           onPointerSignal: _onPointerSignal,
@@ -306,6 +308,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
             onScaleEnd: _onScaleEnd,
             onTapUp: widget.decoration.onTapUp,
             onTapDown: widget.decoration.onTapDown,
+            disableGestures: widget.decoration.disableGestures,
             child: child,
           ),
         );
